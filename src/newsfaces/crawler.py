@@ -11,7 +11,6 @@ from utils import make_request, parse_html, make_link_absolute, page_grab
 DEFAULT_DELAY = 0.5
 
 
-
 class Crawler:
     """
     Need to define at least two properties:
@@ -76,26 +75,29 @@ class WaybackCrawler(Crawler):
         self.session = WaybackSession()
         self.client = WaybackClient(self.session)
 
-    # def crawl(self, startdate, break_point):
-    #     results = self.client.search(self.url, match_type="exact", from_date=startdate)
-    #     crosstime_urls = list(itertools.islice(results, break_point))
-    #     post_date_articles = set()
-    #     for i in range(len(crosstime_urls)):
-    #         date = datetime.datetime.strptime(startdate, "%Y%m%d")
-    #         if crosstime_urls[i].timestamp.date() >= date.date():
-    #             articles = self.get_archive_urls(crosstime_urls[i].view_url, Crawler.selectors)
-    #             # converts archive links back to current article links
-    #             articles = [memento_url_data(item)[0] for item in articles]
-    #             post_date_articles.update(articles)
-    #     return post_date_articles
-
     def crawl(self,startdate,enddate,delta_hrs):
+        """
+        Crawl the internet archive to obtain the urls contained in the url attribute
+        from a specified period of time.
+
+        Inputs: 
+        -startdate (lst): Specify date to start scraping from.
+        List containing three parameters in the following order
+        (1) int, year; (2) int, month; and (3) int, day
+        -enddate (lst): Specifies date to end scraping. Follows same structure as 
+        startdate
+        -delta_hrs (int): Gap in hours on how often to look for the last archived
+        version of the url attribute
+        returns:
+        -articles_set(set): Set containing the urls obtained in the crawling process
+        """
+
         #Create datetime - objects to crawl using wayback
         year, month, day = startdate
         current_date = datetime.datetime(year,month,day)
         year, month, day = enddate
         end_date = datetime.datetime(year,month,day)
-        post_date_articles = set()
+        articles_set = set()
 
         last_url_visited = None
 
@@ -109,11 +111,11 @@ class WaybackCrawler(Crawler):
             if last_url_visited != url:
                 articles = self.get_archive_urls(url,self.selector,self.session)
                 articles = [memento_url_data(item)[0] for item in articles]
-                post_date_articles.update(articles)
+                articles_set.update(articles)
 
             last_url_visited = url
             current_date += datetime.timedelta(hours = delta_hrs)
-        return post_date_articles
+        return articles_set
     
     def get_archive_urls(self, url, selectors):
         """
