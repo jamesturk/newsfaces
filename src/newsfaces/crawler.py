@@ -6,13 +6,15 @@ import lxml.html
 from wayback import WaybackClient, memento_url_data, WaybackSession
 import itertools
 import datetime
-from utils import make_request, parse_html, make_link_absolute, page_grab 
+from utils import make_request, parse_html, make_link_absolute, page_grab
+import pytz
 
 DEFAULT_DELAY = 0.5
-url=""
-selectors=[]
+url = ""
+selectors = []
 
-class Crawler():
+
+class Crawler:
     """
     Need to define at least two properties:
     * start_url: the URL to start crawling from
@@ -88,32 +90,38 @@ class WaybackCrawler(Crawler):
     #             post_date_articles.update(articles)
     #     return post_date_articles
 
-    def crawl(self,startdate,enddate,delta_hrs):
-        #Create datetime - objects to crawl using wayback
+    def crawl(self, startdate, enddate, delta_hrs):
+        # Create datetime - objects to crawl using wayback
         year, month, day = startdate
-        current_date = datetime.datetime(year,month,day)
+        current_date = datetime.datetime(
+            year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc")
+        )
         year, month, day = enddate
-        end_date = datetime.datetime(year,month,day)
+        end_date = datetime.datetime(year, month, day)
         post_date_articles = set()
 
         last_url_visited = None
-
-        #Crawl internet archive once every delta_hrs from startdate until enddate
+        # Crawl internet archive once every delta_hrs from startdate until enddate
         while current_date != end_date:
-            results = self.client.search(self.url, match_type="exact", from_date=current_date)
+            results = self.client.search(
+                self.url, match_type="exact", from_date=current_date
+            )
             record = next(results)
             waybackurl = record.view_url
-            #To avoid fetching urls multiple times, check if there are no updates in
-            #the delta_hrs period
-            if last_url_visited != url:
-                articles = self.get_archive_urls(waybackurl,self.selector)
+            # To avoid fetching urls multiple times, check if there are no updates in
+            # the delta_hrs period
+            if last_url_visited != waybackurl:
+                articles = self.get_archive_urls(waybackurl, self.selector)
                 articles = [memento_url_data(item)[0] for item in articles]
                 post_date_articles.update(articles)
-
-            last_url_visited = waybackurl
-            current_date += datetime.timedelta(hours = delta_hrs)
+                last_url_visited = waybackurl
+            current_date += datetime.timedelta(hours=delta_hrs)
+            next_time = next(results).timestamp
+            print(current_date, "next", next_time)
+            if next_time > current_date:
+                current_date = next_time
         return post_date_articles
-    
+
     def get_archive_urls(self, url, selectors):
         """
         might be overriden in child class
@@ -134,12 +142,9 @@ class WashingtonPost(WaybackCrawler):
         Implement get_archive_urls here to override behavior
         """
 
+
 class Fox(WaybackCrawler):
     def __init__(self):
         super().__init__()
-        self.url="https://www.foxnews.com/politics"
-        self.selector=['article']
-
-    
-a=Fox()
-a.crawl([2022,1,1],[2022,1,10],6)
+        self.url = "https://www.foxnews.com/politics"
+        self.selector = ["article"]
