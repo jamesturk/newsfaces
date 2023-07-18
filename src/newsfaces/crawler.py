@@ -1,4 +1,15 @@
+# Util Functions
+import time
+import requests
+from urllib.parse import urlparse
+import lxml.html
+from wayback import WaybackClient, memento_url_data, WaybackSession
+import itertools
+import datetime
+from utils import make_request, parse_html, make_link_absolute, page_grab 
+
 DEFAULT_DELAY = 0.5
+
 
 
 class Crawler:
@@ -61,10 +72,10 @@ class Crawler:
 class WaybackCrawler(Crawler):
     def __init__(self):
         self.session = WaybackSession()
-        self.client = WaybackClient(session)
+        self.client = WaybackClient(self.session)
 
     def crawl(self, startdate, break_point):
-        results = client.search(self.start_url, match_type="exact", from_date=startdate)
+        results = self.client.search(self.start_url, match_type="exact", from_date=startdate)
         crosstime_urls = list(itertools.islice(results, break_point))
         post_date_articles = set()
         for i in range(len(crosstime_urls)):
