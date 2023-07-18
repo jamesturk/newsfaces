@@ -102,16 +102,16 @@ class WaybackCrawler(Crawler):
         while current_date != end_date:
             results = self.client.search(self.url, match_type="exact", from_date=current_date)
             record = next(results)
-            url = record.view_url
+            waybackurl = record.view_url
             #To avoid fetching urls multiple times, check if there are no updates in
             #the delta_hrs period
             if last_url_visited != url:
-                articles = self.get_archive_urls(self.url,self.selector)
+                articles = self.get_archive_urls(waybackurl,self.selector)
                 print(articles)
                 articles = [memento_url_data(item)[0] for item in articles]
                 post_date_articles.update(articles)
 
-            last_url_visited = url
+            last_url_visited = waybackurl
             current_date += datetime.timedelta(hours = delta_hrs)
         return post_date_articles
     
