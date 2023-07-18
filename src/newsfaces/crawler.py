@@ -107,7 +107,6 @@ class WaybackCrawler(Crawler):
             #the delta_hrs period
             if last_url_visited != url:
                 articles = self.get_archive_urls(waybackurl,self.selector)
-                print(articles)
                 articles = [memento_url_data(item)[0] for item in articles]
                 post_date_articles.update(articles)
 
