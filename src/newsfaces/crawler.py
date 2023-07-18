@@ -22,6 +22,8 @@ class Crawler:
     def __init__(self):
         self.session = requests.Session()
         self.delay = DEFAULT_DELAY
+        self.url=""
+        self.selector=[]
 
     def make_request(self, url):
         """
@@ -81,7 +83,7 @@ class WaybackCrawler(Crawler):
         for i in range(len(crosstime_urls)):
             date = datetime.datetime.strptime(startdate, "%Y%m%d")
             if crosstime_urls[i].timestamp.date() >= date.date():
-                articles = self.get_archive_urls(crosstime_urls[i].view_url, selectors)
+                articles = self.get_archive_urls(crosstime_urls[i].view_url, Crawler.selectors)
                 # converts archive links back to current article links
                 articles = [memento_url_data(item)[0] for item in articles]
                 post_date_articles.update(articles)
