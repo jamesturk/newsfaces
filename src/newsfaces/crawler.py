@@ -141,7 +141,7 @@ class WashingtonPost(WaybackCrawler):
         """
         Implement get_archive_urls here to override behavior
         """
-3
+
 
 class Fox(WaybackCrawler):
     def __init__(self):
