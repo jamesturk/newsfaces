@@ -97,12 +97,13 @@ class WaybackCrawler(Crawler):
             year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc")
         )
         year, month, day = enddate
-        end_date = datetime.datetime(year, month, day)
+        end_date = datetime.datetime(year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc"))
         post_date_articles = set()
 
         last_url_visited = None
         # Crawl internet archive once every delta_hrs from startdate until enddate
-        while current_date != end_date:
+        while current_date < end_date:
+            print(current_date, "next", end_date)
             results = self.client.search(
                 self.url, match_type="exact", from_date=current_date
             )
@@ -117,7 +118,6 @@ class WaybackCrawler(Crawler):
                 last_url_visited = waybackurl
             current_date += datetime.timedelta(hours=delta_hrs)
             next_time = next(results).timestamp
-            print(current_date, "next", next_time)
             if next_time > current_date:
                 current_date = next_time
         return post_date_articles
@@ -141,9 +141,15 @@ class WashingtonPost(WaybackCrawler):
         """
         Implement get_archive_urls here to override behavior
         """
-
+3
 
 class Fox(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.url = "https://www.foxnews.com/politics"
+        self.selector = ["article"]
+
+class WashingtonTimes(WaybackCrawler):
     def __init__(self):
         super().__init__()
         self.url = "https://www.foxnews.com/politics"
