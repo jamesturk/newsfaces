@@ -20,7 +20,7 @@ class NprCrawler(Crawler):
         month(int): Month of last article retrieved
 
         """
-        url = self.url + "start=" + str(start) + "&date" + str(date)
+        url = self.url + "start={}&date={}".format(start,date)
         root = self.make_request(url)
         article_elements = root.cssselect("h2.title")
         if len(article_elements) == 0:
@@ -61,7 +61,6 @@ class NprCrawler(Crawler):
             start += 15
             page += 1
             print("Obtaining links for ",month,"-",year, ",page:",page)
-            time.sleep(.5)
         
         return month_urls
 
@@ -74,12 +73,11 @@ class NprCrawler(Crawler):
         Return:
         - npr_url(set): Set of all the NPR politics section url until the specified year
         """
-        npr_urls = set()
         for year in range(min_year,2024):
             for month in range(1,13):
-                npr_urls.update(self.obtain_monthly_urls(0,month,year))
+                self.links.update(self.obtain_monthly_urls(0,month,year))
 
-        return npr_urls
+        return self.links
     
 
 class NewsmaxCrawler(Crawler):
@@ -118,17 +116,15 @@ class NewsmaxCrawler(Crawler):
         years = [*range(min_year,2024,1)]
         months = [*range(1,13,1)]
         
-        newsmax_links = {}
 
         #Obtain news for 
         for year in years:
             for month in months:
                 date = str(year) + "-" + str(month)
                 print("Obtaining news from:",date)
-                newsmax_links[date] = self.obtain_page_urls(str(year),str(month))
-                time.sleep(1)
+                self.links.update(self.obtain_page_urls(str(year),str(month)))
 
-        return newsmax_links    
+        return self.links  
 
 
 class DailyCrawler(Crawler):
@@ -184,20 +180,58 @@ class DailyCrawler(Crawler):
         """
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
-        politics_set = set()
         years = [*range(min_year,2024,1)]
         page = 1
         for year in reversed(years):
             print("Obtainings links for", year)
             year_set, page = self.obtain_year_urls(page,year)
-            politics_set.update(year_set)
+            self.links.update(year_set)
             page += 1
 
-        return politics_set
+        return self.links
     
 
-test_daily = DailyCrawler()
-test_daily.crawl()
+class CnnCrawler(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.url = "https://search.api.cnn.com/content?q=politics"
+        self.wayback_url = "https://www.cnn.com/politics"
+    
+    def obtain_page_urls(self, from_art="0",page="1"):
+        page_links = set()
+        url =  self.url + "&size=10&from={}&page={}&sort=newest&sections=politics".format(from_art,page)
+        resp = self.session.get(url)
+        resp_json = resp.json()
+        for article in resp_json["result"]:
+            page_links.add(article["url"])
+            year = re.search(r'\d{4}',article["lastPublishDate"]).group()
+        
+        return page_links, year
+    
+    def crawl_non_wayback(self, min_year=2016):
+        cnn_links = set()
+        #Crawl and retrieve Urls using helper function
+        from_art = 0
+        page = 1
+        year = 9999
+        
+        page_set_len = 0
+
+        while int(year) >= min_year:
+            print("Obtaining results for page", page)
+            page_urls, year = self.obtain_page_urls(from_art,page)
+            cnn_links.update(page_urls)
+            from_art += 10
+            page += 1
+            len_set = (len(cnn_links))
+            if len_set == page_set_len:
+                break
+            else:
+                page_set_len = len_set
+        
+        self.links.update(cnn_links)
+
+        return cnn_links
 
 
 
