@@ -1,7 +1,8 @@
 from crawler import Crawler,WaybackCrawler
 import time
 import re
-
+from utils import make_link_absolute
+from wayback import WaybackClient, memento_url_data, WaybackSession
 
 class NprCrawler(Crawler):
 
@@ -73,11 +74,12 @@ class NprCrawler(Crawler):
         Return:
         - npr_url(set): Set of all the NPR politics section url until the specified year
         """
+        articles_set = set()
         for year in range(min_year,2024):
             for month in range(1,13):
-                self.links.update(self.obtain_monthly_urls(0,month,year))
+                articles_set.update(self.obtain_monthly_urls(0,month,year))
 
-        return self.links
+        return articles_set
     
 
 class NewsmaxCrawler(Crawler):
@@ -115,16 +117,16 @@ class NewsmaxCrawler(Crawler):
         """
         years = [*range(min_year,2024,1)]
         months = [*range(1,13,1)]
-        
+        articles_set = set()        
 
         #Obtain news for 
         for year in years:
             for month in months:
                 date = str(year) + "-" + str(month)
                 print("Obtaining news from:",date)
-                self.links.update(self.obtain_page_urls(str(year),str(month)))
+                articles_set.update(self.obtain_page_urls(str(year),str(month)))
 
-        return self.links  
+        return articles_set 
 
 
 class DailyCrawler(Crawler):
@@ -182,31 +184,14 @@ class DailyCrawler(Crawler):
         """
         years = [*range(min_year,2024,1)]
         page = 1
+        articles_set = set()
         for year in reversed(years):
             print("Obtainings links for", year)
             year_set, page = self.obtain_year_urls(page,year)
-            self.links.update(year_set)
+            articles_set.update(year_set)
             page += 1
 
-        return self.links
-    
-
-class CnnCrawler(WaybackCrawler):
-    def __init__(self):
-        super().__init__()
-        self.url = "https://search.api.cnn.com/content?q=politics"
-        self.wayback_url = "https://www.cnn.com/politics"
-    
-    def obtain_page_urls(self, from_art="0",page="1"):
-        page_links = set()
-        url =  self.url + "&size=10&from={}&page={}&sort=newest&sections=politics".format(from_art,page)
-        resp = self.session.get(url)
-        resp_json = resp.json()
-        for article in resp_json["result"]:
-            page_links.add(article["url"])
-            year = re.search(r'\d{4}',article["lastPublishDate"]).group()
-        
-        return page_links, year
+        return articles_set()
     
     def crawl_non_wayback(self, min_year=2016):
         cnn_links = set()
@@ -228,10 +213,36 @@ class CnnCrawler(WaybackCrawler):
                 break
             else:
                 page_set_len = len_set
-        
-        self.links.update(cnn_links)
 
         return cnn_links
 
+class BreitbartCrawler(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.start_url="/https://www.breitbart.com/politics/"
+        self.session = WaybackSession()
+        self.client = WaybackClient(self.session)
+
+    def get_archive_urls(self, url):
+        response = self.make_request(url)
+        urls = []
+        article_elements = response.cssselect("article")
+        for article in article_elements:
+                atr = article.cssselect("a")
+                if atr and len(atr) > 0:
+                    href = atr[0].get("href")
+                    if len(href) > 0:
+                        urls.append(
+                            make_link_absolute(href, "https://web.archive.org/")
+                        )
+        return urls
 
 
+class CnnCrawler(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.start_url="/https://www.cnn.com/politics/"
+        self.selectors = ["div.container__item"]
+
+test_cnn = CnnCrawler()
+test_cnn.crawl([2022,1,1],[2022,1,31])

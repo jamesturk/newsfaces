@@ -13,15 +13,14 @@ from politico import politico_get_urls
 from ap import get_urls_ap
 
 DEFAULT_DELAY = 0.5
-url = ""
-selectors = []
 
 class Crawler(object):
     def __init__(self):  
         self.session = requests.Session()
         self.delay = DEFAULT_DELAY
-        self.start_url = url
-        self.selectors = selectors
+        self.start_url = ""
+        self.selectors = []
+        self.prefix = None
 
     def make_request(self, url):
         """
@@ -63,9 +62,12 @@ class Crawler(object):
                 if atr and len(atr) > 0:
                     href = atr[0].get("href")
                     if len(href) > 0:
-                        urls.append(
-                            make_link_absolute(href, "https://web.archive.org/")
+                        if self.prefix != None:
+                            urls.append(
+                            make_link_absolute(href, self.prefix)
                         )
+                        else:
+                            urls.append(href)
         return urls
 
 
@@ -74,37 +76,44 @@ class WaybackCrawler(Crawler):
         super().__init__()
         self.session = WaybackSession()
         self.client = WaybackClient(self.session)
+        self.prefix = "https://web.archive.org/"
 
-    def crawl(self, startdate, enddate, delta_hrs):
-        # Create datetime - objects to crawl using wayback
-        year, month, day = startdate
-        current_date = datetime.datetime(
-            year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc")
-        )
-        year, month, day = enddate
-        end_date = datetime.datetime(year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc"))
+    def crawl(self, startdate, enddate, delta_hrs = 6):
+
         post_date_articles = set()
 
-        last_url_visited = None
-        # Crawl internet archive once every delta_hrs from startdate until enddate
-        while current_date < end_date:
-            print(current_date, "next", end_date)
-            results = self.client.search(
+        # Create datetime - objects to crawl using wayback
+        year, month, day = startdate
+        current_date = datetime.datetime(year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc"))
+
+        year, month, day = enddate
+        end_date = datetime.datetime(year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc"))
+        
+
+        #Get first result
+        results = self.client.search(
                 self.start_url, match_type="exact", from_date=current_date
             )
-            record = next(results)
-            waybackurl = record.view_url
-            # To avoid fetching urls multiple times, check if there are no updates in
-            # the delta_hrs period
-            if last_url_visited != waybackurl:
-                articles = self.get_archive_urls(waybackurl, self.selector)
-                print(articles)
-                articles = [memento_url_data(item)[0] for item in articles]
-                post_date_articles.update(articles)
-                last_url_visited = waybackurl
-            current_date += datetime.timedelta(hours=delta_hrs)
+        record = next(results)
+
+        # Crawl internet archive in gaps of at least delta_hrs
+        while current_date < end_date:
+            #Get URL
+            print(current_date, "next", end_date)
+            waybackurl = record.view_url 
+            articles = self.get_archive_urls(waybackurl, self.selector)
+            print(articles)
+            post_date_articles.update(articles)
+            #If gap between fetched and next result is less than delta_hrs,
+            # search the archive for the first results in at least delta_hrs
             next_time = next(results).timestamp
-            if next_time > current_date:
+            if next_time - current_date < datetime.timedelta(
+                hours=delta_hrs):
+                current_date += datetime.timedelta(hours=delta_hrs)
+                results = self.client.search(
+                self.start_url, match_type="exact", from_date=current_date)
+                record = next(results)
+            else:
                 current_date = next_time
         return post_date_articles
 
@@ -113,13 +122,10 @@ class WaybackCrawler(Crawler):
         """
         might be overriden in child class
         """
-        return self.get_urls(url, selectors)
+        articles = self.get_urls(url, selectors)
+        articles = [memento_url_data(item)[0] for item in articles]
 
-class s(Crawler):
-    def crawl(self):
-        """
-        Implement crawl here to override behavior
-        """
+        return articles
 
 
 class WashingtonPost(WaybackCrawler):
@@ -177,6 +183,8 @@ class AP(WaybackCrawler):
         Implement get_archive_urls here to override behavior
         """
         return get_urls_ap(url)
+    def crawl(self, startdate=[2018,10,13], enddate =[], delta_hrs=6):
+        return super().crawl(startdate, enddate, delta_hrs)
 
 
 
