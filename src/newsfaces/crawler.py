@@ -13,8 +13,7 @@ DEFAULT_DELAY = 0.5
 url = ""
 selectors = []
 
-
-class Crawler:
+class Crawler(url, selectors):
     """
     Need to define at least two properties:
     * start_url: the URL to start crawling from
@@ -24,6 +23,11 @@ class Crawler:
     def __init__(self):
         self.session = requests.Session()
         self.delay = DEFAULT_DELAY
+<<<<<<< Updated upstream
+=======
+        self.url=url
+        self.selector=selectors
+>>>>>>> Stashed changes
 
     def make_request(self, url):
         """
