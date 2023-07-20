@@ -8,26 +8,20 @@ import itertools
 import datetime
 from utils import make_request, parse_html, make_link_absolute, page_grab
 import pytz
+from nbc import get_nbc
+from politico import politico_get_urls
+from ap import get_urls_ap
 
 DEFAULT_DELAY = 0.5
 url = ""
 selectors = []
 
-class Crawler(url, selectors):
-    """
-    Need to define at least two properties:
-    * start_url: the URL to start crawling from
-    * selectors: a list of css selectors
-    """
-
-    def __init__(self):
+class Crawler(object):
+    def __init__(self):  
         self.session = requests.Session()
         self.delay = DEFAULT_DELAY
-<<<<<<< Updated upstream
-=======
-        self.url=url
-        self.selector=selectors
->>>>>>> Stashed changes
+        self.start_url = url
+        self.selectors = selectors
 
     def make_request(self, url):
         """
@@ -76,23 +70,10 @@ class Crawler(url, selectors):
 
 
 class WaybackCrawler(Crawler):
-    def __init__(self):
+    def __init__(self):  
         super().__init__()
         self.session = WaybackSession()
         self.client = WaybackClient(self.session)
-
-    # def crawl(self, startdate, break_point):
-    #     results = self.client.search(self.url, match_type="exact", from_date=startdate)
-    #     crosstime_urls = list(itertools.islice(results, break_point))
-    #     post_date_articles = set()
-    #     for i in range(len(crosstime_urls)):
-    #         date = datetime.datetime.strptime(startdate, "%Y%m%d")
-    #         if crosstime_urls[i].timestamp.date() >= date.date():
-    #             articles = self.get_archive_urls(crosstime_urls[i].view_url, Crawler.selectors)
-    #             # converts archive links back to current article links
-    #             articles = [memento_url_data(item)[0] for item in articles]
-    #             post_date_articles.update(articles)
-    #     return post_date_articles
 
     def crawl(self, startdate, enddate, delta_hrs):
         # Create datetime - objects to crawl using wayback
@@ -109,7 +90,7 @@ class WaybackCrawler(Crawler):
         while current_date < end_date:
             print(current_date, "next", end_date)
             results = self.client.search(
-                self.url, match_type="exact", from_date=current_date
+                self.start_url, match_type="exact", from_date=current_date
             )
             record = next(results)
             waybackurl = record.view_url
@@ -117,6 +98,7 @@ class WaybackCrawler(Crawler):
             # the delta_hrs period
             if last_url_visited != waybackurl:
                 articles = self.get_archive_urls(waybackurl, self.selector)
+                print(articles)
                 articles = [memento_url_data(item)[0] for item in articles]
                 post_date_articles.update(articles)
                 last_url_visited = waybackurl
@@ -126,12 +108,12 @@ class WaybackCrawler(Crawler):
                 current_date = next_time
         return post_date_articles
 
+
     def get_archive_urls(self, url, selectors):
         """
         might be overriden in child class
         """
         return self.get_urls(url, selectors)
-
 
 class s(Crawler):
     def crawl(self):
@@ -146,15 +128,56 @@ class WashingtonPost(WaybackCrawler):
         Implement get_archive_urls here to override behavior
         """
 
-
 class Fox(WaybackCrawler):
     def __init__(self):
         super().__init__()
-        self.url = "https://www.foxnews.com/politics"
+        self.start_url = "https://www.foxnews.com/politics"
         self.selector = ["article"]
 
 class WashingtonTimes(WaybackCrawler):
     def __init__(self):
         super().__init__()
-        self.url = "https://www.foxnews.com/politics"
+        self.start_url = 'https://www.washingtontimes.com/news/politics/'
         self.selector = ["article"]
+
+class NBC(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.start_url='https://www.nbcnews.com/politics/'
+        self.selector =[]
+    def get_archive_urls(self, url, selectors):
+        """
+        Implement get_archive_urls here to override behavior
+        """
+        return get_nbc(url, self.session)
+
+class Politico(Crawler):
+    def __init__(self):
+        super().__init__()
+
+    def crawl(self):
+        """
+        Implement crawl here to override behavior
+        """
+        return politico_get_urls()
+
+class TheHill(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.start_url = 'https://thehill.com/policy/'
+        self.selector = ['div.archive__item__content','h2.node__title.node-title']
+
+class AP(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.start_url='https://apnews.com/politics'
+        self.selector =[]
+    def get_archive_urls(self, url, selectors):
+        """
+        Implement get_archive_urls here to override behavior
+        """
+        return get_urls_ap(url)
+
+
+
+       
