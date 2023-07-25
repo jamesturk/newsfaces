@@ -8,9 +8,9 @@ import itertools
 import datetime
 from utils import make_request, parse_html, make_link_absolute, page_grab
 import pytz
-from nbc import get_nbc
-from politico import politico_get_urls
-from ap import get_urls_ap
+# from nbc import get_nbc
+# from politico import politico_get_urls
+# from ap import get_urls_ap
 
 DEFAULT_DELAY = 0.5
 
