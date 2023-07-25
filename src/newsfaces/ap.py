@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from utils import page_grab, make_link_absolute
+from crawlers.utils import page_grab, make_link_absolute
 def get_urls_ap(url):
     """
     This function takes a URLs and returns lists of URLs
