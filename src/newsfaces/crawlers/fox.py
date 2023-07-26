@@ -1,8 +1,5 @@
 # Util Functions
-from crawlers.utils import make_request, make_link_absolute, page_grab
-from nbc import get_nbc
-from politico import politico_get_urls
-from ap import get_urls_ap
+from crawlers.utils import make_link_absolute, page_grab
 from crawlers.crawler import Crawler, WaybackCrawler
 import json
 

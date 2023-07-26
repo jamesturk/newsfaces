@@ -1,3 +1,7 @@
+from .crawler import Crawler, WaybackCrawler
+from ..utils import page_grab, make_link_absolute
+
+
 class BBC_Latest(Crawler):
     def __init__(self):
         super().__init__()
@@ -35,7 +39,6 @@ class BBC_Latest(Crawler):
             A list of URLs to each video and article on that page.
         """
         response = page_grab(url)
-        urls = []
         container = response.cssselect("div")
         filtered_container = [
             elem for elem in container if elem.get("type") is not None
@@ -77,7 +80,6 @@ class BBC(WaybackCrawler):
             A list of URLs to each video and article on that page.
         """
         response = page_grab(url)
-        urls = []
         container = response.cssselect("div")
         filtered_container = [
             elem for elem in container if elem.get("type") is not None

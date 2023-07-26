@@ -2,8 +2,6 @@
 import time
 import requests
 from urllib.parse import urlparse
-import sys
-import json
 import lxml.html
 import csv
 from wayback import WaybackClient, memento_url_data, WaybackSession

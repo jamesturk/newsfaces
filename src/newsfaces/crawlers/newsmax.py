@@ -1,3 +1,6 @@
+from .crawler import Crawler
+
+
 class NewsmaxCrawler(Crawler):
     def __init__(self):
         super().__init__()

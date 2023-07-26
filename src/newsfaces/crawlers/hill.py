@@ -1,3 +1,6 @@
+from .crawler import WaybackCrawler
+
+
 class TheHill(WaybackCrawler):
     def __init__(self):
         super().__init__()

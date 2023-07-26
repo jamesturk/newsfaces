@@ -1,8 +1,4 @@
-from crawler import Crawler, WaybackCrawler
-import time
-import re
-from utils import make_link_absolute
-from wayback import WaybackClient, memento_url_data, WaybackSession
+from crawler import WaybackCrawler
 
 
 class CnnCrawler(WaybackCrawler):

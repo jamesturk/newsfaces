@@ -1,3 +1,7 @@
+import re
+from .crawler import Crawler
+
+
 class DailyCrawler(Crawler):
     def __init__(self):
         super().__init__()

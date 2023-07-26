@@ -1,8 +1,5 @@
-from .crawler import Crawler, WaybackCrawler
-import time
+from .crawler import Crawler
 import re
-from utils import make_link_absolute
-from wayback import WaybackClient, memento_url_data, WaybackSession
 
 
 class NprCrawler(Crawler):

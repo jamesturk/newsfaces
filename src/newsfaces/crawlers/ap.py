@@ -1,5 +1,5 @@
-from urllib.parse import urlparse
-from crawlers.utils import page_grab, make_link_absolute
+from .crawlers.utils import page_grab, make_link_absolute
+from .crawlers.crawler import WaybackCrawler
 
 
 def get_urls_ap(url):

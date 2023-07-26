@@ -1,5 +1,4 @@
-# Util Functions
-from urllib.parse import urlparse
+from .crawler import Crawler
 from crawlers.utils import make_link_absolute, page_grab
 
 

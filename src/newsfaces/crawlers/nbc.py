@@ -1,7 +1,6 @@
 # Util Functions
-from urllib.parse import urlparse
-from crawlers.utils import make_request, parse_html, make_link_absolute, page_grab
-from crawlers.utils import crawl_wayback, create_csv, get_urls
+from .crawler import WaybackCrawler
+from ..utils import make_request
 import re
 
 url = "https://www.nbcnews.com/politics/"
