@@ -23,8 +23,9 @@ def get_urls_ap(url):
                 atr = j.cssselect("a")
                 for a in atr:
                     href = a.get("href")
-                    if href.startswith('/web/'):
-                         href = make_link_absolute(href, "https://web.archive.org")
                     if href is not None:
+                        if href.startswith('/web/'):
+                            href = make_link_absolute(href, "https://web.archive.org")
                         urls.append(href)
+    print("here")
     return urls
