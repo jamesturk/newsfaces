@@ -1,0 +1,52 @@
+# Util Functions
+from crawlers.utils import make_request, make_link_absolute, page_grab
+from nbc import get_nbc
+from politico import politico_get_urls
+from ap import get_urls_ap
+from crawlers.crawler import Crawler, WaybackCrawler
+import json
+
+
+class Fox(WaybackCrawler):
+    def __init__(self):
+        super().__init__()
+        self.start_url = "https://www.foxnews.com/politics"
+        self.selector = ["article"]
+
+
+class Fox_API(Crawler):
+    def __init__(self):
+        super().__init__()
+        self.start_url = "https://www.foxnews.com/api/article-search?searchBy=categories&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
+
+    def crawl(self, base_page, article=set(), video=set()):
+        """
+        From an initial API query page, run through all possible
+        API queries-- putting articles and videos on the pages into
+        a set.
+
+        Returns:
+        Set of articles and videos
+        """
+        response = page_grab(base_page)
+        json_data = json.loads(response.text)
+        json_data
+        for i in json_data:
+            url = make_link_absolute(i["url"], "https://www.foxnews.com/politics")
+            if url.startswith("https://www.foxnews.com/politics"):
+                article.add(url)
+            else:
+                video.add(url)
+        begin = base_page.find("from") + 5
+        end = base_page.find("&media")
+        articlenumber = int(base_page[begin:end])
+        if articlenumber < 9970:
+            articlenumber += 30
+            articlenumber = str(articlenumber)
+            rev_basepage = (
+                base_page[0:begin]
+                + articlenumber
+                + base_page[end : (len(base_page) + 1)]
+            )
+            self.crawl(rev_basepage, article, video)
+        return article.union(video)
