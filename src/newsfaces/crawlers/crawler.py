@@ -4,13 +4,9 @@ import requests
 from urllib.parse import urlparse
 import lxml.html
 from wayback import WaybackClient, memento_url_data, WaybackSession
-import itertools
 import datetime
-from utils import make_request, parse_html, make_link_absolute, page_grab
+from .utils import  make_link_absolute
 import pytz
-# from nbc import get_nbc
-# from politico import politico_get_urls
-# from ap import get_urls_ap
 
 DEFAULT_DELAY = 0.5
 
@@ -102,6 +98,7 @@ class WaybackCrawler(Crawler):
             print(current_date, "next", end_date)
             waybackurl = record.view_url 
             articles = self.get_archive_urls(waybackurl, self.selector)
+            articles = [memento_url_data(item)[0] for item in articles]
             post_date_articles.update(articles)
             #If gap between fetched and next result is less than delta_hrs,
             # search the archive for the first results in at least delta_hrs
@@ -122,8 +119,7 @@ class WaybackCrawler(Crawler):
         might be overriden in child class
         """
         articles = self.get_urls(url, selectors)
-        articles = [memento_url_data(item)[0] for item in articles]
-
+        
         return articles
 
 

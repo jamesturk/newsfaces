@@ -1,12 +1,6 @@
 # Util Functions
-import time
-import requests
 from urllib.parse import urlparse
-import sys
-import json
-import lxml.html
-import csv
-from utils import make_request, parse_html, make_link_absolute, page_grab
+from crawlers.utils import  make_link_absolute, page_grab
 
 def get_urls(url):
     """
