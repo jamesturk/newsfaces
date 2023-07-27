@@ -1,5 +1,5 @@
 # Util Functions
-from crawlers.utils import make_link_absolute, page_grab
+from newsfaces.utils import make_link_absolute, page_grab
 from crawlers.crawler import Crawler, WaybackCrawler
 import json
 
