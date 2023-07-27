@@ -4,7 +4,7 @@ import requests
 import lxml.html
 from wayback import WaybackClient, memento_url_data, WaybackSession
 import datetime
-from utils import make_link_absolute
+from newsfaces.utils import make_link_absolute
 import pytz
 
 DEFAULT_DELAY = 0.5

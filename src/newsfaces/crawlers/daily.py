@@ -1,5 +1,5 @@
 import re
-from .crawler import Crawler
+from crawler import Crawler
 
 
 class DailyCrawler(Crawler):

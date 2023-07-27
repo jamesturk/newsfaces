@@ -1,6 +1,6 @@
 import json
-from .crawler import Crawler, WaybackCrawler
-from ..utils import make_link_absolute, make_request
+from crawler import Crawler, WaybackCrawler
+from newsfaces.utils import make_link_absolute, make_request
 
 
 class WashingtonPost_API(Crawler):

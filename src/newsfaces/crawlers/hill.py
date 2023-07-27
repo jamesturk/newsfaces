@@ -1,4 +1,4 @@
-from .crawler import WaybackCrawler
+from crawler import WaybackCrawler
 
 
 class TheHill(WaybackCrawler):

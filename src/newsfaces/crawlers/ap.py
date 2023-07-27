@@ -1,5 +1,5 @@
-from .crawlers.utils import page_grab, make_link_absolute
-from .crawlers.crawler import WaybackCrawler
+from newsfaces.utils import page_grab, make_link_absolute
+from crawler import WaybackCrawler
 
 
 def get_urls_ap(url):
@@ -34,7 +34,6 @@ def get_urls_ap(url):
                         if href.startswith("/web/"):
                             href = make_link_absolute(href, "https://web.archive.org")
                         urls.append(href)
-    print("here")
     return urls
 
 
