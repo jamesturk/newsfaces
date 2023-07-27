@@ -9,6 +9,7 @@ from .crawlers import (
     CnnCrawler,
     DailyCrawler,
     Fox,
+    # we do need both fox scrapers
     Fox_API,
     TheHill,
     NBC,
