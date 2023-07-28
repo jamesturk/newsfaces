@@ -2,6 +2,7 @@ from .crawler import Crawler
 import re
 import datetime
 
+CURRENT_YEAR = datetime.datetime.now().year
 
 class NprCrawler(Crawler):
     def __init__(self):
@@ -83,9 +84,9 @@ class NprCrawler(Crawler):
         Return:
         - npr_url(set): Set of all the NPR politics section url until the specified year
         """
-        min_year = int(start_time.strf("%Y"))
+        min_year = start_time.year
         articles_set = set()
-        for year in range(min_year, 2024):
+        for year in range(min_year, CURRENT_YEAR+1):
             for month in range(1, 13):
                 articles_set.update(self.obtain_monthly_urls(0, month, year))
 

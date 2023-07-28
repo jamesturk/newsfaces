@@ -3,6 +3,8 @@ import datetime
 from .crawler import Crawler
 from ..utils import make_link_absolute
 
+CURRENT_YEAR = datetime.datetime.now().year
+
 class DailyCrawler(Crawler):
     def __init__(self):
         super().__init__()
@@ -56,8 +58,8 @@ class DailyCrawler(Crawler):
         """
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
-        min_year = int(start_date.strftime("%Y"))
-        years = [*range(min_year, 2024, 1)]
+        min_year = start_date.year
+        years = list(range(min_year, CURRENT_YEAR+1, 1))
         page = 1
         articles_set = set()
         for year in reversed(years):
