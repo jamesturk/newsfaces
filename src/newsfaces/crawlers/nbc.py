@@ -1,6 +1,6 @@
 # Util Functions
 from .crawler import WaybackCrawler
-from ..utils import make_request
+from newsfaces.utils import make_request
 import re
 
 url = "https://www.nbcnews.com/politics/"
