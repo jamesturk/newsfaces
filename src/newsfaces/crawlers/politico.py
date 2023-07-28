@@ -1,5 +1,7 @@
+
 from .crawler import Crawler
-from ..utils import make_link_absolute, page_grab
+from newsfaces.utils import make_link_absolute, page_grab
+
 
 
 def get_urls(url):
