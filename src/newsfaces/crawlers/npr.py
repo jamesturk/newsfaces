@@ -1,5 +1,6 @@
 from .crawler import Crawler
 import re
+import datetime
 
 
 class NprCrawler(Crawler):
@@ -16,7 +17,6 @@ class NprCrawler(Crawler):
         Return:
         url_set(set): Set of articles
         month(int): Month of last article retrieved
-
         """
         url = self.url + "start={}&date={}".format(start, date)
         root = self.make_request(url)
@@ -75,7 +75,7 @@ class NprCrawler(Crawler):
 
         return month_urls
 
-    def crawl(self, min_year):
+    def crawl(self, start_time = datetime.date(2015,1,1)):
         """
         Crawl the NPR politics section
         Inputs:
@@ -83,6 +83,7 @@ class NprCrawler(Crawler):
         Return:
         - npr_url(set): Set of all the NPR politics section url until the specified year
         """
+        min_year = int(start_time.strf("%Y"))
         articles_set = set()
         for year in range(min_year, 2024):
             for month in range(1, 13):
