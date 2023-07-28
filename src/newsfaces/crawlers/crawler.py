@@ -8,7 +8,9 @@ from ..utils import make_link_absolute
 import pytz
 
 DEFAULT_DELAY = 0.5
-
+START_DATE = datetime.datetime(2015,1,1,0,0, tzinfo=pytz.timezone("utc"))
+END_DATE = datetime.datetime.now(pytz.timezone("utc"))
+DELTA_HRS = 6
 
 class Crawler(object):
     def __init__(self):
@@ -72,22 +74,23 @@ class WaybackCrawler(Crawler):
         self.client = WaybackClient(self.session)
         self.prefix = "https://web.archive.org/"
 
-    def crawl(self, startdate, enddate, delta_hrs=6):
+    def crawl(self, start_date= START_DATE, end_date = END_DATE, delta_hrs=DELTA_HRS):
+        """
+        Crawl to obtain all the urls of articles contained in start_url in the different 
+        stored versions in the internet archive between two dates. 
+
+        Inputs:
+        - start_date(datetime object): Earliest day for which to look for results
+        - end_date(datetime object): Latest day for which to look for results
+        -delta_hrs (int): Threshold of minimum number of hours between the 
+        timestamp of consecutive internet archive results for which to look for article urls.
+        Return:
+        - post_date_articles(set): Set of urls obtained from the crawling process
+        """
         post_date_articles = set()
-        print(startdate)
-
-        # Create datetime - objects to crawl using wayback
-        year, month, day = startdate
-        current_date = datetime.datetime(
-            year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc")
-        )
-
-        year, month, day = enddate
-        end_date = datetime.datetime(
-            year, month, day, 0, 0, 0, tzinfo=pytz.timezone("utc")
-        )
 
         # Get first result
+        current_date = start_date
         results = self.client.search(
             self.start_url, match_type="exact", from_date=current_date
         )
@@ -99,19 +102,16 @@ class WaybackCrawler(Crawler):
             print(current_date, "next", end_date)
             waybackurl = record.view_url
             articles = self.get_archive_urls(waybackurl, self.selector)
-            print(len(articles))
             articles = [
                 memento_url_data(item)[0]
                 if (item.find("/web/") or item.find("web.archive.org") in item)
                 else item
                 for item in articles
             ]
-            print(len(articles))
             post_date_articles.update(articles)
             # If gap between fetched and next result is less than delta_hrs,
             # search the archive for the first results in at least delta_hrs
             next_time = next(results).timestamp
-            print(next_time)
             if next_time - current_date < datetime.timedelta(hours=delta_hrs):
                 current_date += datetime.timedelta(hours=delta_hrs)
                 results = self.client.search(
