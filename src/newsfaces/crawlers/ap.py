@@ -1,6 +1,6 @@
 
 from newsfaces.utils import page_grab, make_link_absolute
-from crawler import WaybackCrawler
+from .crawler import WaybackCrawler
 
 
 def get_urls_ap(url):

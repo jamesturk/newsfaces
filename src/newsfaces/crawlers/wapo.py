@@ -1,5 +1,5 @@
 import json
-from crawler import Crawler, WaybackCrawler
+from .crawler import Crawler, WaybackCrawler
 from newsfaces.utils import make_link_absolute, make_request
 
 

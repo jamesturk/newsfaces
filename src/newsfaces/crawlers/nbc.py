@@ -1,5 +1,5 @@
 # Util Functions
-from crawler import WaybackCrawler
+from .crawler import WaybackCrawler
 from newsfaces.utils import make_request
 import re
 

@@ -1,4 +1,4 @@
-from crawler import WaybackCrawler, WaybackClient, WaybackSession
+from .crawler import WaybackCrawler, WaybackClient, WaybackSession
 from newsfaces.utils import make_link_absolute
 
 
