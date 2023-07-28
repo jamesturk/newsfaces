@@ -1,11 +1,13 @@
 import re
+import datetime
 from .crawler import Crawler
-
+from ..utils import make_link_absolute
 
 class DailyCrawler(Crawler):
     def __init__(self):
         super().__init__()
         self.url = "https://dailycaller.com/section/politics/"
+        self.prefix = "https://dailycaller.com/"
 
     def obtain_page_urls(self, page="1"):
         """
@@ -27,8 +29,7 @@ class DailyCrawler(Crawler):
             # Are articles from another webpage checkyourfact and we will drop these
             if link.startswith("http://checkyourfact"):
                 continue
-            full_link = "dailycaller.com" + link
-
+            full_link = make_link_absolute(link, self.prefix)
             article_list.append(full_link)
 
         year = re.search(r"\d{4}", article_list[-1]).group()
@@ -51,10 +52,11 @@ class DailyCrawler(Crawler):
 
         return links_set, page
 
-    def crawl(self, min_year=2016):
+    def crawl(self, start_date=datetime.date(2015,1,1)):
         """
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
+        min_year = int(start_date.strftime("%Y"))
         years = [*range(min_year, 2024, 1)]
         page = 1
         articles_set = set()
@@ -64,27 +66,5 @@ class DailyCrawler(Crawler):
             articles_set.update(year_set)
             page += 1
 
-        return articles_set()
+        return articles_set
 
-    def crawl_non_wayback(self, min_year=2016):
-        cnn_links = set()
-        # Crawl and retrieve Urls using helper function
-        from_art = 0
-        page = 1
-        year = 9999
-
-        page_set_len = 0
-
-        while int(year) >= min_year:
-            print("Obtaining results for page", page)
-            page_urls, year = self.obtain_page_urls(from_art, page)
-            cnn_links.update(page_urls)
-            from_art += 10
-            page += 1
-            len_set = len(cnn_links)
-            if len_set == page_set_len:
-                break
-            else:
-                page_set_len = len_set
-
-        return cnn_links
