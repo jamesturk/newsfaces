@@ -111,14 +111,15 @@ class WaybackCrawler(Crawler):
             articles = self.get_archive_urls(waybackurl, self.selector)
             articles = [
                 memento_url_data(item)[0]
-                if (item.find("/web/") or item.find("web.archive.org") in item)
+                if ("/web/" in item or "web.archive.org" in item)
                 else item
                 for item in articles
             ]
             post_date_articles.update(articles)
             # If gap between fetched and next result is less than delta_hrs,
             # search the archive for the first results in at least delta_hrs
-            next_time = next(results).timestamp
+            next_result=next(results)
+            next_time = next_result.timestamp
             if next_time - current_date < datetime.timedelta(hours=delta_hrs):
                 current_date += datetime.timedelta(hours=delta_hrs)
                 results = self.client.search(
@@ -127,6 +128,8 @@ class WaybackCrawler(Crawler):
                 record = next(results)
             else:
                 current_date = next_time
+                record = next_result
+                
         return post_date_articles
 
     def get_archive_urls(self, url, selectors):
