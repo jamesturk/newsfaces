@@ -42,6 +42,3 @@ class AP(WaybackCrawler):
                                 href = make_link_absolute(href, "https://web.archive.org")
                             urls.append(href)
         return urls
-
-    def crawl(self, startdate=[2018, 10, 13], enddate=[], delta_hrs=6):
-        return super().crawl(startdate, enddate, delta_hrs)
