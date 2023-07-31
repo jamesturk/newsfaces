@@ -6,15 +6,19 @@ class BBC_Latest(Crawler):
     def __init__(self):
         super().__init__()
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t?page=1"
-
-    def crawl(self, url=None, articles=set(), videos=set()):
+    
+    def crawl(self):
+        '''
+        run get_html with correct initial html from init
+        '''
+        return self.get_html(self.start_url)
+    
+    def get_html(self, url, articles=set(), videos=set()):
         """
         Takes an initial url and runs get_urls on all possible
         API queries. Gathering all possible articles and videos
         from the API into a set.
         """
-        if url is None:
-            url = self.start_url
         article, video = self.get_urls(url)
         articles = articles.union(article)
         videos = videos.union(video)
@@ -38,7 +42,7 @@ class BBC_Latest(Crawler):
         Returns:
             A list of URLs to each video and article on that page.
         """
-        response = page_grab(url)
+        response = self.make_request(url)
         container = response.cssselect("div")
         filtered_container = [
             elem for elem in container if elem.get("type") is not None
@@ -79,7 +83,7 @@ class BBC(WaybackCrawler):
         Returns:
             A list of URLs to each video and article on that page.
         """
-        response = page_grab(url)
+        response = self.make_request(url)
         container = response.cssselect("div")
         filtered_container = [
             elem for elem in container if elem.get("type") is not None
@@ -97,5 +101,4 @@ class BBC(WaybackCrawler):
                 articles.add(href)
             elif type == "video":
                 videos.add(href)
-        print(articles)
         return articles.union(videos)

@@ -25,7 +25,6 @@ class Crawler(object):
         This function ensure that the domain matches what is
         expected and that the rate limit is obeyed.
         """
-
         time.sleep(self.delay)
         print(f"Fetching {url}")
         resp = self.session.get(url)
