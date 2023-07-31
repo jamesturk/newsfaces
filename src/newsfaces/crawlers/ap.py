@@ -1,5 +1,5 @@
 
-from newsfaces.utils import page_grab, make_link_absolute
+from newsfaces.utils import make_link_absolute
 from .crawler import WaybackCrawler
 
 
