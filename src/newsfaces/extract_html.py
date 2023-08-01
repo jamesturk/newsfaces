@@ -30,7 +30,7 @@ def extract_html(
         if html.cssselect(selector)[0]:
             article_body = html.cssselect(selector)[0]
     if head_img_select:
-        imgs += extract_head_img(article_body,head_img_div,head_img_select)
+        imgs += extract_head_img(html,head_img_div,head_img_select)
     imgs += extract_imgs(article_body,img_p_selector,img_selector)
     art_text = extract_text(article_body, p_selector)
     if t_selector:
