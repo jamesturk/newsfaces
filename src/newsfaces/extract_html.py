@@ -10,8 +10,8 @@ def extract_html(
     Inputs:
         - html(str): Full html of an artcile url
         - article_selector(str): css selector for article container
-        -head_img_div(list)- css selector for parent div of headline image 
-        -head_img_select(list)- css selector for images
+        - head_img_div(list)- css selector for parent div of headline image 
+        - head_img_select(list)- css selector for images
         - img_p_selector(list): css selector for the parent elements of images in article
         - img_selector(list): css selector for images living inside the article
         container
