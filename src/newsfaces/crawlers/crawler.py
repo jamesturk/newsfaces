@@ -118,7 +118,8 @@ class WaybackCrawler(Crawler):
             post_date_articles.update(articles)
             # If gap between fetched and next result is less than delta_hrs,
             # search the archive for the first results in at least delta_hrs
-            next_result=next(results)
+            try: next_result=next(results)
+            except StopIteration: break 
             next_time = next_result.timestamp
             if next_time - current_date < datetime.timedelta(hours=delta_hrs):
                 current_date += datetime.timedelta(hours=delta_hrs)
