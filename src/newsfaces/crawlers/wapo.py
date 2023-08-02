@@ -23,7 +23,7 @@ class WashingtonPost_API(Crawler):
         Returns:
         Set of articles
         """
-        response = self.html_grab(base_page)
+        response = self.http_get(base_page)
         json_data = json.loads(response.text)
         for i in range(len(json_data)):
             url_text = json_data["items"][i]["canonical_url"]

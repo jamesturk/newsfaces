@@ -11,9 +11,9 @@ class BBC_Latest(Crawler):
         '''
         run get_html with correct initial html from init
         '''
-        return self.get_html(self.start_url)
+        return self.get_newslink(self.start_url)
     
-    def get_html(self, url, articles=set(), videos=set()):
+    def get_newslink(self, url, articles=set(), videos=set()):
         """
         Takes an initial url and runs get_urls on all possible
         API queries. Gathering all possible articles and videos

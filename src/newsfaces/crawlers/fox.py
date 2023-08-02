@@ -19,9 +19,9 @@ class Fox_API(Crawler):
         '''
         run get_html with correct initial html from init
         '''
-        return self.get_html(self.start_url)
+        return self.get_newslinks(self.start_url)
 
-    def get_html(self, base_page, article=set(), video=set()):
+    def get_newslinks(self, base_page, article=set(), video=set()):
         """
         From an initial API query page, run through all possible
         API queries-- putting articles and videos on the pages into
@@ -30,9 +30,8 @@ class Fox_API(Crawler):
         Returns:
         Set of articles and videos
         """
-        response = self.make_request(base_page)
+        response = self.http_get(base_page)
         json_data = json.loads(response.text)
-        json_data
         for i in json_data:
             url = make_link_absolute(i["url"], "https://www.foxnews.com/politics")
             if url.startswith("https://www.foxnews.com/politics"):

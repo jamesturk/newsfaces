@@ -52,8 +52,6 @@ class Politico(Crawler):
         return urls
 
     def politico_get_urls(self):
-        urllist = []
-        urllist2 = []
         urllist = self.recurse_politico("https://www.politico.com/politics/1", 1700)
         urllist2 = self.recurse_politico("https://www.politico.com/politics/1700", 3400)
         pooled = set(urllist + urllist2)
