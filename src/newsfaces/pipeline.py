@@ -1,6 +1,6 @@
 from databeakers import Pipeline
 from databeakers.http import HttpResponse, HttpRequest
-from .models import ArticleURL
+from .models import ArticleURL, Article
 from .crawlers import (
     AP,
     BBC,
@@ -43,13 +43,18 @@ SOURCE_MAPPING = {
     "washtimes": (WashingtonTimes(),),
 }
 
-for source, crawlers in SOURCE_MAPPING.items():
-    pipeline.add_beaker(f"article_{source}", ArticleURL)
+# For now, we're going to construct parallel pipelines for each source.
+# Each will go from url -> response -> article
+for source, classes in SOURCE_MAPPING.items():
+    pipeline.add_beaker(f"url_{source}", ArticleURL)
     pipeline.add_beaker(f"response_{source}", HttpResponse)
-    for crawler in crawlers:
-        pipeline.add_seed(source, "article", crawler)
+    pipeline.add_beaker(f"article_{source}", Article)
+    (crawler,) = classes
+    pipeline.add_seed(source, f"url_{source}", crawler.crawl)
     pipeline.add_transform(
-        f"article_{source}",
+        f"url_{source}",
         f"response_{source}",
         HttpRequest,
     )
+    # TODO: uncomment once extractors are in place
+    # pipeline.add_transform(f"response_{source}", f"article_{source}", extractor)
