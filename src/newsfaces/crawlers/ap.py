@@ -1,4 +1,3 @@
-
 from newsfaces.utils import make_link_absolute
 from .crawler import WaybackCrawler
 
@@ -6,7 +5,7 @@ from .crawler import WaybackCrawler
 class AP(WaybackCrawler):
     def __init__(self):
         super().__init__()
-        self.urls= ["https://apnews.com/politics","https://apnews.com/hub/politics"]
+        self.urls = ["https://apnews.com/politics", "https://apnews.com/hub/politics"]
         self.start_url = ""
         self.selector = []
 
@@ -34,31 +33,35 @@ class AP(WaybackCrawler):
         for a in selectors:
             container = response.cssselect(a)
             if len(container) > 0:
-                urls+=(self.parse_links(container))
-        xpath_sel= ['TwoColumnContainer','CardHeadline']
-            # for items that have random characters continually added at the end so we do non-exact matching
+                urls += self.parse_links(container)
+        xpath_sel = ["TwoColumnContainer", "CardHeadline"]
+        # for items that have random characters continually added at the end so we do non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@class, '{j}')]")
             if len(container) > 0:
-                urls+=(self.parse_links(container))
-                    
+                urls += self.parse_links(container)
+
         return urls
 
     def crawl(self, startdate, enddate, delta_hrs=6):
-            if startdate < datetime.datetime(2023,6,26,0,0, tzinfo=pytz.timezone("utc")):
-                self.start_url= self.urls[1]
-                changepage_date= datetime.datetime(2023,6,26,0,0, tzinfo=pytz.timezone("utc"))
-                hub_site=super().crawl(startdate, changepage_date, delta_hrs)
-            self.start_url= self.urls[0]
-            current_site=super().crawl(startdate, enddate, delta_hrs)
-            return hub_site.union(current_site)
+        if startdate < datetime.datetime(
+            2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc")
+        ):
+            self.start_url = self.urls[1]
+            changepage_date = datetime.datetime(
+                2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc")
+            )
+            hub_site = super().crawl(startdate, changepage_date, delta_hrs)
+        self.start_url = self.urls[0]
+        current_site = super().crawl(startdate, enddate, delta_hrs)
+        return hub_site.union(current_site)
 
     def parse_links(self, container):
-        '''
+        """
         Takes a list of container objects and returns the urls
         from within
-        '''
-        urls=[]
+        """
+        urls = []
         for j in container[0]:
             atr = j.cssselect("a")
             for a in atr:

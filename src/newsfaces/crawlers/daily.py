@@ -3,6 +3,7 @@ import datetime
 from .crawler import Crawler
 from ..utils import make_link_absolute
 
+
 class DailyCrawler(Crawler):
     def __init__(self):
         super().__init__()
@@ -52,7 +53,7 @@ class DailyCrawler(Crawler):
 
         return links_set, page
 
-    def crawl(self, start_date=datetime.date(2015,1,1)):
+    def crawl(self, start_date=datetime.date(2015, 1, 1)):
         """
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
@@ -67,4 +68,3 @@ class DailyCrawler(Crawler):
             page += 1
 
         return articles_set
-
