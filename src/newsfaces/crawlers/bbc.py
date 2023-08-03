@@ -1,5 +1,5 @@
 from .crawler import Crawler, WaybackCrawler
-from ..utils import page_grab, make_link_absolute
+from newsfaces.utils import make_link_absolute
 
 
 class BBC_Latest(Crawler):

@@ -1,5 +1,7 @@
 # newsfaces
 
+Work in Progress
+
 ## Example Session
 
 Parameters TBD, but to give a rough idea of usage:
