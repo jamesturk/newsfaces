@@ -1,6 +1,5 @@
-
 from .crawler import Crawler
-from newsfaces.utils import make_link_absolute
+from newsfaces.utils import make_link_absolute, page_grab
 
 
 class Politico(Crawler):
@@ -24,7 +23,7 @@ class Politico(Crawler):
         Returns:
             A list of article URLs on that page.
         """
-        response =self.make_request(url)
+        response = self.make_request(url)
         urls = []
         container = response.cssselect("div.summary")
 
@@ -34,7 +33,6 @@ class Politico(Crawler):
                 href = atr[0].get("href")
                 urls.append(make_link_absolute(href, "https://www.politico.com"))
         return urls
-
 
     def recurse_politico(self, url, breakpoint, urls=[]):
         """
