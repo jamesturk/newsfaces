@@ -48,7 +48,7 @@ class Extractor(object):
         art_text = self.extract_text(article_body, self.p_selector)
         for t in self.t_selector:
             if html.cssselect(t)[0].text is not None:
-                t_text = self.html.cssselect(t)[0].text
+                t_text = html.cssselect(t)[0].text
                 break
         return imgs, art_text, t_text
 
