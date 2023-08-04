@@ -1,11 +1,9 @@
-
 from newsfaces.utils import page_grab
 from newsfaces.models import Article, Image, ImageType
 
 
 class Extractor(object):
-    def __init__(self, html):
-        self.html = html
+    def __init__(self):
         self.article_body = []
         self.img_p_selector = []
         self.img_selector = ["img"]
@@ -14,7 +12,7 @@ class Extractor(object):
         self.p_selector = ["p"]
         self.t_selector = []
 
-    def extract_html(self):
+    def extract_html(self, url):
         """
         Extract the image and text content from and HTML:
         Inputs:
@@ -28,8 +26,7 @@ class Extractor(object):
             - p_selector(list): css selector for paragraphs living inside the article container
             - t_selector(list): css selector for title living inside the container
         Return:
-            -imgs(lst): list where each element is an image represented as a dictionary
-            with src, alt, title, and caption as fields
+            -imgs(lst): list where each element is an instance of a Image Class
             - art_text(str): Article text
             - t_text(str): Title
         """
@@ -37,18 +34,20 @@ class Extractor(object):
         art_text = []
         imgs = []
 
+        html = page_grab(url)
+
         for selector in self.article_body:
-            if len(self.html.cssselect(selector)[0]) > 0:
-                article_body = self.html.cssselect(selector)[0]
+            if len(html.cssselect(selector)[0]) > 0:
+                article_body = html.cssselect(selector)[0]
                 break
         if self.head_img_div:
-            imgs += self.extract_imgs(
-                self.html, self.head_img_div, self.head_img_select
+            imgs += self.extract_head_img(
+                html, self.head_img_div, self.head_img_select
             )
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
         art_text = self.extract_text(article_body, self.p_selector)
         for t in self.t_selector:
-            if self.html.cssselect(t)[0].text is not None:
+            if html.cssselect(t)[0].text is not None:
                 t_text = self.html.cssselect(t)[0].text
                 break
         return imgs, art_text, t_text
@@ -72,7 +71,7 @@ class Extractor(object):
 
         return text
 
-    def extract_imgs(self, html, img_p_selector, img_selector):
+    def extract_head_img(self, html, img_p_selector, img_selector):
         """
         Extract the image content from an HTML:
         Inputs:
@@ -83,7 +82,6 @@ class Extractor(object):
             -imgs(lst): list where each element is an image represented as a dictionary
             with src, alt, title, and caption as fields
         """
-        imgs = []
         for selector in img_p_selector:
             img_container = html.cssselect(selector)
             if len(img_container) == 0:
@@ -98,11 +96,39 @@ class Extractor(object):
                             caption=i.get("caption") or "",
                             alt_text=i.get("alt") or "",
                         )
-                        imgs.append(img_item)
                     break
+        return [img_item]
+    
+    def extract_imgs(self, html, img_p_selector, img_selector):
+        """
+        Extract the image content from an HTML:
+        Inputs:
+            - html(str): html to extract images from
+            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_selector(list): css selector for the image elements
+            Return:
+            -imgs(lst): list where each element is an image represented as an image object
+        """
+        imgs = []
+        for selector in img_p_selector:
+            img_container = html.cssselect(selector)
+            for container in img_container:
+                for j in img_selector:
+                    photos = container.cssselect(j)
+                    for i in photos:
+                        img_item = Image(
+                            url=i.get("src") or "",
+                            image_type=ImageType("main"),
+                            caption=i.get("caption") or "",
+                            alt_text=i.get("alt") or "",
+                        )
+                    imgs.append(img_item)
         return imgs
-
-    def scrape(self):
-        imgs, art_text, t_text = self.extract_html()
+    
+    def scrape(self, url):
+        """
+        Extract html and from 
+        """
+        imgs, art_text, t_text = self.extract_html(url)
         article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
         return article
