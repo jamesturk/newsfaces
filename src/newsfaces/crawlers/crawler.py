@@ -21,14 +21,13 @@ class Crawler(object):
         self.selectors = []
         self.prefix = None
 
-    def html_grab(self, url):
+    def http_get(self, url):
         """
         Make a request to `url` and return the raw response.
 
         This function ensure that the domain matches what is
         expected and that the rate limit is obeyed.
         """
-
         time.sleep(self.delay)
         print(f"Fetching {url}")
         resp = self.session.get(url)
@@ -39,7 +38,7 @@ class Crawler(object):
         Make a request to `url` and returns usable HTML via lxml.
         """
         # check if URL starts with an allowed domain name
-        response = self.html_grab(url)
+        response = self.http_get(url)
         return lxml.html.fromstring(response.text)
 
     def crawl(self) -> list[str]:
