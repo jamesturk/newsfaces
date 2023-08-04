@@ -71,7 +71,3 @@ class AP(WaybackCrawler):
                         href = make_link_absolute(href, "https://web.archive.org")
                     urls.append(href)
         return urls
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main

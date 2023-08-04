@@ -1,7 +1,3 @@
 *.pyc
-<<<<<<< HEAD
-newsfaces.db
 *.dist
-=======
 newsfaces.db*
->>>>>>> origin/main
