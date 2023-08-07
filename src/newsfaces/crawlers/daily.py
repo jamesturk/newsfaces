@@ -1,7 +1,9 @@
 import re
 import datetime
 from .crawler import Crawler
-from ..utils import make_link_absolute
+from ..utils import make_link_absolute, page_grab
+from ..extract_html import Extractor 
+from ..models import Image, ImageType
 
 class DailyCrawler(Crawler):
     def __init__(self):
@@ -68,3 +70,41 @@ class DailyCrawler(Crawler):
 
         return articles_set
 
+class DailyExtractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["div.article-content-wrap.sticky-columns"]
+        self.img_p_selector = ["div.m"]
+        self.img_selector = ["img"]
+        self.head_img_div = ["div.contain"]
+        self.head_img_select = ["img"]
+        self.p_selector = ["p"]
+        self.t_selector = ["h1"]
+    
+    def extract_head_img(self, html, img_p_selector, img_selector):
+        """
+        Extract the image content from an HTML:
+        Inputs:
+            - html(str): html to extract images from
+            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_selector(list): list of css selector for the image elements
+            Return:
+            -imgs(lst): list where each element is an image represented as a dictionary
+            with src, alt, title, and caption as fields
+        """
+        for selector in img_p_selector:
+            img_container = html.cssselect(selector)
+            if len(img_container) == 0:
+                continue
+            for container in img_container:
+                for j in img_selector:
+                    photos = container.cssselect(j)
+                    for i in photos:
+                        img_item = Image(
+                            url=i.get("data-src") or "",
+                            image_type=ImageType("main"),
+                            caption=i.get("caption") or "",
+                            alt_text=i.get("alt") or "",
+                        )
+                    break
+        return [img_item]
