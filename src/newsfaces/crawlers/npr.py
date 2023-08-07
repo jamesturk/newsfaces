@@ -1,7 +1,9 @@
-from .crawler import Crawler
 import re
 import datetime
+from .crawler import Crawler
+from ..extract_html import Extractor 
 
+CURRENT_YEAR = datetime.datetime.now().year
 
 class NprCrawler(Crawler):
     def __init__(self):
@@ -83,10 +85,20 @@ class NprCrawler(Crawler):
         Return:
         - npr_url(set): Set of all the NPR politics section url until the specified year
         """
-        min_year = int(start_time.strf("%Y"))
+        min_year = start_time.year
         articles_set = set()
-        for year in range(min_year, 2024):
+        for year in range(min_year, CURRENT_YEAR+1):
             for month in range(1, 13):
                 articles_set.update(self.obtain_monthly_urls(0, month, year))
 
         return articles_set
+
+class NPRExtractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["article.story"]
+        self.img_p_selector = ["div.imagewrap"]
+        self.img_selector = ["img"]
+        self.p_selector = ["p"]
+        self.t_selector = ["h1"]
+        self.head_img_select = []
