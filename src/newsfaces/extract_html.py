@@ -45,7 +45,9 @@ class Extractor(object):
                 html, self.head_img_div, self.head_img_select
             )
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
+        imgs += self.extract_social_media_image(html)
         art_text = self.extract_text(article_body, self.p_selector)
+        
         for t in self.t_selector:
             if html.cssselect(t)[0].text is not None:
                 t_text = html.cssselect(t)[0].text
@@ -124,6 +126,14 @@ class Extractor(object):
                         )
                     imgs.append(img_item)
         return imgs
+    
+    def extract_social_media_image(self, html):
+        container = html.cssselect('meta[property="og:image"]')
+        img_item = Image(url=container[0].get("content"),
+                         image_type=ImageType("social"),
+                         caption = "",
+                         alt_text="")
+        return [img_item]
     
     def scrape(self, url):
         """
