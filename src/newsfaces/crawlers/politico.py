@@ -37,7 +37,7 @@ class Politico(Crawler):
                 urls.append(make_link_absolute(href, "https://www.politico.com"))
         return urls
 
-    def homepage_swap_politico(self, url, breakpoint, urls=[]):
+    def page_swap_politico(self, url, breakpoint, urls=[]):
         """
         Runs get_url's function on all possible article landing pages
         until a specific page (breakpoint)
@@ -55,7 +55,7 @@ class Politico(Crawler):
         newlink = "https://www.politico.com/politics/1"
         urls = set()
         while newlink is not None:
-            urllist, newlink = self.homepage_swap_politico(newlink, 3400)
+            urllist, newlink = self.page_swap_politico(newlink, 3400)
             urls = urls.union(set(urllist))
         return urls
 
