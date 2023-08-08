@@ -72,16 +72,6 @@ class BBC(WaybackCrawler):
     def get_archive_urls(self, url, selector):
         return self.get(url)
 
-
-class BBC(WaybackCrawler):
-    def __init__(self):
-        super().__init__()
-        self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t"
-        self.selector = ["div.archive__item__content", "h2.node__title.node-title"]
-
-    def get_archive_urls(self, url, selector):
-        return self.get(url)
-
     def get(self, url, articles=set(), videos=set()):
         """
         This function takes a URLs and returns lists of URLs
