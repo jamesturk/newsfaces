@@ -58,9 +58,6 @@ class Fox_API(Crawler):
 class Fox_Extractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.html = page_grab(
-            "https://www.foxnews.com/politics/kerry-ripped-demanding-agriculture-emission-cuts-bankrupt-every-farmer"
-        )
         self.article_body = ["div.article-content-wrap.sticky-columns"]
         self.img_p_selector = ["div.m"]
         self.img_selector = ["img"]
