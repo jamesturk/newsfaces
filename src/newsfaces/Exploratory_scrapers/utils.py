@@ -15,7 +15,7 @@ def make_request(url, session=None):
     """
     Make a request to `url` and return the raw response.
 
-    This function ensure that the domain matches what is expected and 
+    This function ensure that the domain matches what is expected and
     that the rate limit is obeyed.
     """
     # check if URL starts with an allowed domain name
@@ -36,7 +36,7 @@ def make_link_absolute(rel_url, current_url):
 
     Parameters:
         * rel_url:      a URL or fragment
-        * current_url:  a complete URL used to make the request that contained 
+        * current_url:  a complete URL used to make the request that contained
                         a link to rel_url
 
     Returns:

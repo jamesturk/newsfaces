@@ -91,7 +91,7 @@ class WaybackCrawler(Crawler):
         - start_date(datetime object): Earliest day for which to look for results
         - end_date(datetime object): Latest day for which to look for results
         -delta_hrs (int): Threshold of minimum number of hours between the
-                        timestamp of consecutive internet archive results 
+                        timestamp of consecutive internet archive results
                         for which to look for article urls.
         Return:
         - post_date_articles(set): Set of urls obtained from the crawling process

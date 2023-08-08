@@ -23,7 +23,7 @@ class Extractor(object):
             - img_p_selector(list): css selector for the parent elements of images
             - img_selector(list): css selector for images living inside the article
             container
-            - p_selector(list): css selector for paragraphs living inside the 
+            - p_selector(list): css selector for paragraphs living inside the
                                 article container
             - t_selector(list): css selector for title living inside the container
         Return:
@@ -57,7 +57,7 @@ class Extractor(object):
         """
         Extract the article text content from an HTML:
         Inputs:
-            - p_selector(list): css selectors for paragraphs living 
+            - p_selector(list): css selectors for paragraphs living
               inside the article container
         Return:
             - text(str): Article text

@@ -63,7 +63,6 @@ class BBC_Latest(Crawler):
         return articles, videos
 
 
-
 class BBC(WaybackCrawler):
     def __init__(self):
         super().__init__()
@@ -86,7 +85,7 @@ class BBC(WaybackCrawler):
         """
         response = self.make_request(url)
         xpath_sel = ["article", "video"]
-        # for items that have random characters continually added at the 
+        # for items that have random characters continually added at the
         # end so we do non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@type, '{j}')]")
