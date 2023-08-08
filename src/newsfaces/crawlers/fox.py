@@ -15,6 +15,7 @@ class Fox(WaybackCrawler):
 class Fox_API(Crawler):
     def __init__(self):
         super().__init__()
+        self.start_url = "https://www.foxnews.com/api/article-search?searchBy=categories&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
 
     def crawl(self):
         """
