@@ -20,10 +20,11 @@ class Extractor(object):
             - article_selector(str): css selector for article container
             - head_img_div(list)- css selector for parent div of headline image
             - head_img_select(list)- css selector for images
-            - img_p_selector(list): css selector for the parent elements of images in article
+            - img_p_selector(list): css selector for the parent elements of images
             - img_selector(list): css selector for images living inside the article
             container
-            - p_selector(list): css selector for paragraphs living inside the article container
+            - p_selector(list): css selector for paragraphs living inside the 
+                                article container
             - t_selector(list): css selector for title living inside the container
         Return:
             -imgs(lst): list where each element is an instance of a Image Class
@@ -56,7 +57,8 @@ class Extractor(object):
         """
         Extract the article text content from an HTML:
         Inputs:
-            - p_selector(list): css selectors for paragraphs living inside the article container
+            - p_selector(list): css selectors for paragraphs living 
+              inside the article container
         Return:
             - text(str): Article text
         """
@@ -76,7 +78,7 @@ class Extractor(object):
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_p_selector(list): css selector for the parent elements of images
             - img_selector(list): list of css selector for the image elements
             Return:
             -imgs(lst): list where each element is an image represented as a dictionary
@@ -104,10 +106,10 @@ class Extractor(object):
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_p_selector(list): css selector for the parent elements of images
             - img_selector(list): css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as an image object
+            -imgs(lst): each element is an image represented as an image object
         """
         imgs = []
         for selector in img_p_selector:

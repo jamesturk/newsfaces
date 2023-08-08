@@ -63,15 +63,6 @@ class BBC_Latest(Crawler):
         return articles, videos
 
 
-class BBC(WaybackCrawler):
-    def __init__(self):
-        super().__init__()
-        self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t"
-        self.selector = ["div.archive__item__content", "h2.node__title.node-title"]
-
-    def get_archive_urls(self, url, selector):
-        return self.get(url)
-
 
 class BBC(WaybackCrawler):
     def __init__(self):
@@ -95,7 +86,8 @@ class BBC(WaybackCrawler):
         """
         response = self.make_request(url)
         xpath_sel = ["article", "video"]
-        # for items that have random characters continually added at the end so we do non-exact matching
+        # for items that have random characters continually added at the 
+        # end so we do non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@type, '{j}')]")
             if container:
