@@ -5,7 +5,6 @@ from .crawler import WaybackCrawler
 class AP(WaybackCrawler):
     def __init__(self):
         super().__init__()
-        self.urls = ["https://apnews.com/politics", "https://apnews.com/hub/politics"]
         self.start_url = ""
         self.selector = []
 
@@ -43,17 +42,15 @@ class AP(WaybackCrawler):
 
         return urls
 
-    def crawl(self, startdate, enddate, delta_hrs=6):
-        if startdate < datetime.datetime(
-            2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc")
-        ):
-            self.start_url = self.urls[1]
-            changepage_date = datetime.datetime(
-                2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc")
-            )
-            hub_site = super().crawl(startdate, changepage_date, delta_hrs)
+    def crawl(self):
+        self.start_url = "https://apnews.com/politics"
+        change_date = datetime.datetime(2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc"))
+        if self.start_date < change_date:
+            self.start_url = "https://apnews.com/hub/politics"
+            self.end_date = change_date
+            hub_site = super().crawl()
         self.start_url = self.urls[0]
-        current_site = super().crawl(startdate, enddate, delta_hrs)
+        current_site = super().crawl()
         return hub_site.union(current_site)
 
     def parse_links(self, container):
