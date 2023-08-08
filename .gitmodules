@@ -1,3 +1,0 @@
-[submodule "submodules/beakers"]
-	path = submodules/beakers
-	url = git@github.com:jamesturk/beakers.git
