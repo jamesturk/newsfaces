@@ -6,13 +6,13 @@ class BBC_Latest(Crawler):
     def __init__(self):
         super().__init__()
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t?page=1"
-    
+
     def crawl(self):
-        '''
+        """
         run get_html with correct initial html from init
-        '''
-        return self.get_newslink(self.start_url)
-    
+        """
+        return self.get_newslink(self.start_url)[0]
+
     def get_newslink(self, url, articles=set(), videos=set()):
         """
         Takes an initial url and runs get_urls on all possible
@@ -26,7 +26,7 @@ class BBC_Latest(Crawler):
         pagenumber = int(url[begin : len(url)])
         if pagenumber < 42:
             newlink = url[: -len(str(pagenumber))] + str(pagenumber + 1)
-            article, video = self.crawl(newlink, articles, videos)
+            article, video = self.get_newslink(newlink, articles, videos)
             articles = articles.union(article)
             videos = videos.union(video)
         return articles, videos
@@ -94,8 +94,8 @@ class BBC(WaybackCrawler):
             A list of URLs to each video and article on that page.
         """
         response = self.make_request(url)
-        xpath_sel= ['article','video']
-            # for items that have random characters continually added at the end so we do non-exact matching
+        xpath_sel = ["article", "video"]
+        # for items that have random characters continually added at the end so we do non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@type, '{j}')]")
             if container:
