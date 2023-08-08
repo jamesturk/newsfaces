@@ -5,8 +5,6 @@ import re
 url = "https://www.nbcnews.com/politics/"
 
 
-
-
 class NBC(WaybackCrawler):
     def __init__(self):
         super().__init__()
@@ -18,7 +16,7 @@ class NBC(WaybackCrawler):
         Implement get_archive_urls here to override behavior
         """
         return self.get_nbc(url, self.session)
-    
+
     def get_nbc(self, url, session=None):
         response = self.http_get(url, session=None)
 
@@ -43,5 +41,3 @@ class NBC(WaybackCrawler):
                     article.add(fullurl)
 
         return list(article)
-    
-    
