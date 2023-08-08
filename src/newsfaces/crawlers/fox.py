@@ -15,10 +15,11 @@ class Fox(WaybackCrawler):
 class Fox_API(Crawler):
     def __init__(self):
         super().__init__()
+
     def crawl(self):
-        '''
+        """
         run get_html with correct initial html from init
-        '''
+        """
         return self.get_newslinks(self.start_url)
 
     def get_newslinks(self, base_page, article=set(), video=set()):
@@ -63,8 +64,12 @@ class Fox_Extractor(Extractor):
         self.head_img_select = ["img"]
         self.p_selector = ["p"]
         self.t_selector = ["h1", "h6"]
+
     def extract_head_img(self, html="", img_p_selector="", img_selector=""):
         return []
 
+
 a = Fox_Extractor()
-a.scrape("https://www.foxnews.com/politics/kerry-ripped-demanding-agriculture-emission-cuts-bankrupt-every-farmer")
+a.scrape(
+    "https://www.foxnews.com/politics/kerry-ripped-demanding-agriculture-emission-cuts-bankrupt-every-farmer"
+)
