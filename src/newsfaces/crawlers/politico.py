@@ -1,5 +1,5 @@
 from .crawler import Crawler
-from newsfaces.utils import make_link_absolute, page_grab
+from newsfaces.utils import make_link_absolute
 
 
 class Politico(Crawler):

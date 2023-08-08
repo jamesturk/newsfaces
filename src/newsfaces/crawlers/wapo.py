@@ -7,13 +7,13 @@ class WashingtonPost_API(Crawler):
     def __init__(self):
         super().__init__()
         self.start_url = "https://www.washingtonpost.com/prism/api/prism-query?_website=washpost&query=%7B%22query%22%3A%22prism%3A%2F%2Fprism.query%2Fsite-articles-only%2C%2Fpolitics%26offset%3D600%26limit%3D30%22%7D"
-    
+
     def crawl(self):
-        '''
+        """
         run get_html with correct initial html from init
-        '''
+        """
         return self.get_html(self.start_url)
-    
+
     def get_html(self, base_page, article=set(), video=set()):
         """
         From an initial API query page, run through all possible
