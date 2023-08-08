@@ -15,10 +15,11 @@ class Fox_API(Crawler):
     def __init__(self):
         super().__init__()
         self.start_url = "https://www.foxnews.com/api/article-search?searchBy=categories&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
+
     def crawl(self):
-        '''
+        """
         run get_html with correct initial html from init
-        '''
+        """
         return self.get_newslinks(self.start_url)
 
     def get_newslinks(self, base_page, article=set(), video=set()):
