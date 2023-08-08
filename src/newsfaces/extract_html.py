@@ -12,7 +12,7 @@ class Extractor(object):
         self.p_selector = ["p"]
         self.t_selector = []
 
-    def extract_html(self, url):
+    def extract_html(self, html):
         """
         Extract the image and text content from and HTML:
         Inputs:
@@ -33,8 +33,6 @@ class Extractor(object):
         t_text = ""
         art_text = []
         imgs = []
-
-        html = page_grab(url)
 
         for selector in self.article_body:
             if len(html.cssselect(selector)[0]) > 0:
@@ -139,6 +137,7 @@ class Extractor(object):
         """
         Extract html and from 
         """
-        imgs, art_text, t_text = self.extract_html(url)
+        html = page_grab(url)
+        imgs, art_text, t_text = self.extract_html(html)
         article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
         return article
