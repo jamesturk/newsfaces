@@ -1,6 +1,7 @@
 # Util Functions
+from newsfaces.extract_html import Extractor
 from newsfaces.utils import make_link_absolute
-from .crawler import Crawler, WaybackCrawler
+from newsfaces.crawlers.crawler import Crawler, WaybackCrawler
 import json
 
 
@@ -14,7 +15,6 @@ class Fox(WaybackCrawler):
 class Fox_API(Crawler):
     def __init__(self):
         super().__init__()
-        self.start_url = "https://www.foxnews.com/api/article-search?searchBy=categories&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
     def crawl(self):
         '''
         run get_html with correct initial html from init
@@ -51,3 +51,20 @@ class Fox_API(Crawler):
             )
             self.get_html(rev_basepage, article, video)
         return article.union(video)
+
+
+class Fox_Extractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["div.article-content-wrap.sticky-columns"]
+        self.img_p_selector = ["div.m"]
+        self.img_selector = ["img"]
+        self.head_img_div = ["div.contain"]
+        self.head_img_select = ["img"]
+        self.p_selector = ["p"]
+        self.t_selector = ["h1", "h6"]
+    def extract_head_img(self, html="", img_p_selector="", img_selector=""):
+        return []
+
+a = Fox_Extractor()
+a.scrape("https://www.foxnews.com/politics/kerry-ripped-demanding-agriculture-emission-cuts-bankrupt-every-farmer")
