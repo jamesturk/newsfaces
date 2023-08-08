@@ -1,11 +1,9 @@
 # Util Functions
 from newsfaces.extract_html import Extractor
 from newsfaces.utils import make_link_absolute, page_grab
-from newsfaces.crawlers.crawler import Crawler, WaybackCrawler
-import json
-import lxml 
-from newsfaces.extract_html import Extractor
+from newsfaces.crawlers.crawler import Crawler
 from newsfaces.models import Image, Article, ImageType
+
 
 class Politico(Crawler):
     def __init__(self):
@@ -59,22 +57,27 @@ class Politico(Crawler):
         urllist2 = self.recurse_politico("https://www.politico.com/politics/1700", 3400)
         pooled = set(urllist + urllist2)
         return pooled
-    
+
+
 class Politico_Extractor(Extractor):
     def __init__(self):
         super().__init__()
         self.article_body = ["div.story-text"]
-        self.img_p_selector = ["section.media-item.media-item--story.media-item--story-lead"]
+        self.img_p_selector = [
+            "section.media-item.media-item--story.media-item--story-lead"
+        ]
         self.img_selector = ["img"]
-        self.head_img_div = ["section.media-item.media-item--story.media-item--story-lead"]
-        self.video= ['div.media-item__video']
+        self.head_img_div = [
+            "section.media-item.media-item--story.media-item--story-lead"
+        ]
+        self.video = ["div.media-item__video"]
         self.head_img_select = ["img"]
         self.p_selector = ["p"]
         self.t_selector = ["h2.headline"]
 
     def scrape(self, url):
         """
-        Extract html and from 
+        Extract html and from
         """
         html = page_grab(url)
         imgs, art_text, t_text = self.extract_html(html)
@@ -83,32 +86,36 @@ class Politico_Extractor(Extractor):
         return article
 
     def extract_video_imgs(self, html):
-        videos=[]
-        imgs= []
+        videos = []
+        imgs = []
         print(html)
         for i in self.video:
-            videos +=html.cssselect(i)
+            videos += html.cssselect(i)
             for v in videos:
-                item = v.cssselect('video')
-                cap = v.xpath('//div[contains(@class, "vjs-dock-text")]')
+                item = v.cssselect("video")
+                v.xpath('//div[contains(@class, "vjs-dock-text")]')
 
             cap_elements = v.xpath('//div[contains(@class, "vjs-dock-text")]')
-            
+
             # Extract captions from cap_elements
             captions = [element.text_content() for element in cap_elements]
-            
+
             for i, video in enumerate(item):
                 img_item = Image(
-                    url=video.get('poster') or "",
+                    url=video.get("poster") or "",
                     image_type=ImageType("video_thumbnail"),
                     caption=captions[i] if i < len(captions) else "",
-                    alt_text=""
+                    alt_text="",
                 )
                 imgs.append(img_item)
-        
+
         return imgs
+
     def extract_head_img(self, html, img_p_selector, img_selector):
         return []
-            
-a=Politico_Extractor()
-a.scrape('https://www.politico.com/news/2023/08/07/bidenomics-white-house-economy-00109977')
+
+
+a = Politico_Extractor()
+a.scrape(
+    "https://www.politico.com/news/2023/08/07/bidenomics-white-house-economy-00109977"
+)
