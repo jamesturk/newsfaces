@@ -5,7 +5,10 @@ from ..utils import make_link_absolute, page_grab
 from ..extract_html import Extractor 
 from ..models import Image, ImageType
 
+<<<<<<< HEAD
 CURRENT_YEAR = datetime.datetime.now().year
+=======
+>>>>>>> 72af988066f47b9ebdcd2390f8470120566e7a7b
 
 class DailyCrawler(Crawler):
     def __init__(self):
@@ -56,7 +59,7 @@ class DailyCrawler(Crawler):
 
         return links_set, page
 
-    def crawl(self, start_date=datetime.date(2015,1,1)):
+    def crawl(self, start_date=datetime.date(2015, 1, 1)):
         """
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
@@ -106,6 +109,7 @@ class DailyExtractor(Extractor):
                         )
                     
         return [img_item]
+<<<<<<< HEAD
     
     def extract_imgs(self, html, img_p_selector, img_selector):
         """
@@ -138,3 +142,6 @@ class DailyExtractor(Extractor):
                 imgs.append(img_item)
         
         return imgs
+=======
+
+>>>>>>> 72af988066f47b9ebdcd2390f8470120566e7a7b
