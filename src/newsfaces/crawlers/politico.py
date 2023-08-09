@@ -1,4 +1,3 @@
-# Util Functions
 from newsfaces.extract_html import Extractor
 from newsfaces.utils import make_link_absolute, page_grab
 from newsfaces.crawlers.crawler import Crawler
@@ -97,9 +96,3 @@ class Politico_Extractor(Extractor):
                 imgs.append(img_item)
             return imgs
 
-
-# tests
-a = Politico_Extractor()
-a.scrape(
-    "https://www.politico.com/news/2023/08/07/bidenomics-white-house-economy-00109977"
-)
