@@ -37,13 +37,16 @@ class Extractor(object):
 
         for selector in self.article_body:
             if len(html.cssselect(selector)[0]) > 0:
-                article_body = html.cssselect(selector)[0]
+                article_body = html.cssselect(selector)
+                print(selector)
+                print(article_body)
                 break
         if self.head_img_div:
             imgs += self.extract_head_img(html, self.head_img_div, self.head_img_select)
-        imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
+        imgs += self.extract_imgs(article_body[0], self.img_p_selector, self.img_selector)
+        print(self.extract_imgs(article_body, self.img_p_selector, self.img_selector))
         imgs += self.extract_social_media_image(html)
-        art_text = self.extract_text(article_body, self.p_selector)
+        art_text = self.extract_text(article_body[0], self.p_selector)
 
         for t in self.t_selector:
             if html.cssselect(t)[0].text is not None:
@@ -109,9 +112,10 @@ class Extractor(object):
             Return:
             -imgs(lst): each element is an image represented as an image object
         """
+        print(html, "here")
         imgs = []
         for selector in img_p_selector:
-            img_container = html.cssselect(selector)
+            img_container = html[0].cssselect(selector)
             for container in img_container:
                 for j in img_selector:
                     photos = container.cssselect(j)
@@ -124,6 +128,7 @@ class Extractor(object):
                         )
                     imgs.append(img_item)
         return imgs
+        
 
     def extract_social_media_image(self, html):
         container = html.cssselect('meta[property="og:image"]')
