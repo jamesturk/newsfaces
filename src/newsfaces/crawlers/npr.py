@@ -2,7 +2,7 @@ import re
 import datetime
 from .crawler import Crawler
 from ..extract_html import Extractor
-from models import Image, ImageType
+from ..models import Image, ImageType
 
 CURRENT_YEAR = datetime.datetime.now().year
 
