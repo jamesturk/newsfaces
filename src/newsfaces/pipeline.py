@@ -1,5 +1,7 @@
-from databeakers import Pipeline
+from databeakers.pipeline import Pipeline, ErrorType
 from databeakers.http import HttpResponse, HttpRequest
+from databeakers.transforms import RateLimit
+import httpx
 from .models import ArticleURL, Article
 from .crawlers import (
     AP,
@@ -39,39 +41,62 @@ def article_seed_wrapper(crawl_func, source):
 pipeline = Pipeline("newsfaces", "newsfaces.db")
 
 
-SOURCE_MAPPING = {
+WAYBACK_SOURCE_MAPPING = {
     "ap": (AP(), None),
     "bbc_archive": (BBC(), None),
-    "bbc_latest": (BBC_Latest(), None),
-    "breitbart": (BreitbartCrawler(), None),
     "cnn": (CnnCrawler(), None),
-    "daily": (DailyCrawler(), None),
     "fox": (Fox(), None),
-    "fox_api": (Fox_API(), None),
-    "hill": (TheHill(), None),
     "nbc": (NBC(), None),
-    "newsmax": (NewsmaxCrawler(2021), None),
-    "npr": (NprCrawler(), None),
-    "politico": (Politico(), None),
     "wapo": (WashingtonPost(), None),
-    "wapo_api": (WashingtonPost_API(), None),
+    "breitbart": (BreitbartCrawler(), None),
+    "hill": (TheHill(), None),
     "washtimes": (WashingtonTimes(), None),
 }
 
-# For now, we're going to construct parallel pipelines for each source.
-# Each will go from url -> response -> article
+SOURCE_MAPPING = {
+    "bbc_latest": (BBC_Latest(), None),
+    "daily": (DailyCrawler(), None),
+    "fox_api": (Fox_API(), None),
+    "newsmax": (NewsmaxCrawler(2021), None),
+    "npr": (NprCrawler(), None),
+    "politico": (Politico(), None),
+    "wapo_api": (WashingtonPost_API(), None),
+}
+
+
+for source, classes in WAYBACK_SOURCE_MAPPING.items():
+    (crawler, extractor) = classes
+
+    pipeline.add_beaker("archive_url", ArticleURL)
+    pipeline.add_seed(
+        source,
+        "archive_url",
+        crawler.get_wayback_urls,
+    )
+    pipeline.add_beaker("archive_response", HttpResponse)
+    pipeline.add_transform(
+        "archive_url",
+        "archive_response",
+        RateLimit(HttpRequest(), 1),
+        error_map={
+            (httpx.ReadTimeout,): "archive_timeouts",
+            (httpx.RequestError,): "archive_errors",
+        },
+    )
+
+    # TODO: populate url_{source} with the archive urls
+
+# the non-wayback crawlers are url -> response -> article
 for source, classes in SOURCE_MAPPING.items():
     pipeline.add_beaker(f"url_{source}", ArticleURL)
-    pipeline.add_beaker(f"response_{source}", HttpResponse)
-    pipeline.add_beaker(f"article_{source}", Article)
-    (crawler, extractor) = classes
     pipeline.add_seed(
         source, f"url_{source}", article_seed_wrapper(crawler.crawl, source)
     ),
     pipeline.add_transform(
         f"url_{source}",
         f"response_{source}",
-        HttpRequest,
+        HttpRequest(),
     )
     # TODO: uncomment once extractors are in place
+    # pipeline.add_beaker(f"article_{source}", Article)
     # pipeline.add_transform(f"response_{source}", f"article_{source}", extractor)
