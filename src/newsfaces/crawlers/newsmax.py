@@ -1,6 +1,9 @@
 from .crawler import Crawler
 from ..extract_html import Extractor
 from ..models import Image, ImageType
+import datetime
+
+CURRENT_YEAR = datetime.datetime.now().year
 
 
 class NewsmaxCrawler(Crawler):
@@ -36,19 +39,19 @@ class NewsmaxCrawler(Crawler):
         newsmax_links (dict): Dictionary where the keys are str for date (year-mth)
         and values are lists with the urls of that given key
         """
-        years = [*range(min_year, 2024, 1)]
-        months = [*range(1, 13, 1)]
+
         articles_set = set()
 
         # Obtain news for
-        for year in years:
-            for month in months:
+        for year in range(min_year, CURRENT_YEAR + 1):
+            for month in range(1, 13):
                 date = str(year) + "-" + str(month)
                 print("Obtaining news from:", date)
                 articles_set.update(self.obtain_page_urls(str(year), str(month)))
 
         return articles_set
-    
+
+
 class NewsmaxExtractor(Extractor):
     def __init__(self):
         super().__init__()
@@ -58,7 +61,7 @@ class NewsmaxExtractor(Extractor):
         self.p_selector = ["p"]
         self.t_selector = ["h1.article"]
         self.head_img_select = []
-    
+
     def extract_html(self, url):
         """
         Extract the image and text content from and HTML:
@@ -83,27 +86,26 @@ class NewsmaxExtractor(Extractor):
 
         html = page_grab(url)
 
-        #Obtain article body
+        # Obtain article body
         for selector in self.article_body:
             if len(html.cssselect(selector)[0]) > 0:
                 article_body = html.cssselect(selector)[0]
                 break
 
-        #Obtain images
+        # Obtain images
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
         imgs += self.extract_social_media_image(html)
         imgs += self.extract_video_thumbnails(html)
-        
-        #Obtain article and title text
+
+        # Obtain article and title text
         art_text = self.extract_text(article_body, self.p_selector)
-        
+
         for t in self.t_selector:
             if html.cssselect(t)[0].text is not None:
                 t_text = html.cssselect(t)[0].text
                 break
         return imgs, art_text, t_text
-    
-    
+
     def extract_imgs(self, html, img_p_selector, img_selector):
         """
         Extract the image content from an HTML:
@@ -116,20 +118,19 @@ class NewsmaxExtractor(Extractor):
         """
         imgs = []
 
-        
         img_container = html.cssselect(img_p_selector[0])
 
-        #Obtain img info and captions which in the Daily both live inside the
-        #same parent element (img_container)
+        # Obtain img info and captions which in the Daily both live inside the
+        # same parent element (img_container)
         for container in img_container:
 
-            #Inside the image container when grabbing the caption there are two elements
-            #The first has empty text while the second one contains the caption
-            caption = container.cssselect("div.artCaptionContainer")[1].text 
+            # Inside the image container when grabbing the caption there are two elements
+            # The first has empty text while the second one contains the caption
+            caption = container.cssselect("div.artCaptionContainer")[1].text
             for j in img_selector:
                 photos = container.cssselect(j)
-                #Videos live inside the same container as video so need to do
-                #additional check to avoid errors
+                # Videos live inside the same container as video so need to do
+                # additional check to avoid errors
                 if photos:
                     for i in photos:
                         img_item = Image(
@@ -139,18 +140,19 @@ class NewsmaxExtractor(Extractor):
                             alt_text=i.get("alt") or "",
                         )
                     imgs.append(img_item)
-        
+
         return imgs
 
-    
     def extract_video_thumbnails(self, html):
-        caption =html.cssselect("div.artCaptionContainer")[1].text 
-        video_element = html.cssselect('meta[itemprop=thumbnailUrl]')
+        caption = html.cssselect("div.artCaptionContainer")[1].text
+        video_element = html.cssselect("meta[itemprop=thumbnailUrl]")
         if video_element:
-            img_item = Image(url = video_element[0].get("content"),
-                             alt_text= "",
-                             caption= caption or "",
-                             image_type=ImageType("video_thumbnail"))
+            img_item = Image(
+                url=video_element[0].get("content"),
+                alt_text="",
+                caption=caption or "",
+                image_type=ImageType("video_thumbnail"),
+            )
             return [img_item]
         else:
-            return [] 
+            return []
