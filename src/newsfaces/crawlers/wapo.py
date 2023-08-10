@@ -54,7 +54,7 @@ class WashingtonPost_API(Crawler):
 
 class WashingtonPost(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("wapo")
         self.start_url = "https://www.washingtonpost.com/politics/"
         self.selector = ["div.story-headline.pr-sm"]
 

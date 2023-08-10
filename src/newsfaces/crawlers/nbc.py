@@ -7,7 +7,7 @@ url = "https://www.nbcnews.com/politics/"
 
 class NBC(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("nbc")
         self.start_url = "https://www.nbcnews.com/politics/"
         self.selector = []
 

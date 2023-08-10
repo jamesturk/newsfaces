@@ -65,7 +65,7 @@ class BBC_Latest(Crawler):
 
 class BBC(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("bbc")
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t"
         self.selector = ["div.archive__item__content", "h2.node__title.node-title"]
 

@@ -1,11 +1,11 @@
-# Util Functions
 import time
 import requests
-import lxml.html
-from wayback import WaybackClient, memento_url_data, WaybackSession
 import datetime
-from newsfaces.utils import make_link_absolute
+import lxml.html
 import pytz
+from wayback import WaybackClient, memento_url_data, WaybackSession
+from ..utils import make_link_absolute
+from ..models import ArticleURL
 
 DEFAULT_DELAY = 0.5
 START_DATE = datetime.datetime(2020, 1, 1, 0, 0, tzinfo=pytz.timezone("utc"))
@@ -13,7 +13,7 @@ END_DATE = datetime.datetime.now(pytz.timezone("utc"))
 DELTA_HRS = 6
 
 
-class Crawler(object):
+class Crawler:
     def __init__(self):
         self.session = requests.Session()
         self.delay = DEFAULT_DELAY
@@ -76,7 +76,13 @@ class Crawler(object):
 
 
 class WaybackCrawler(Crawler):
-    def __init__(self, start_date=START_DATE, end_date=END_DATE, delta_hrs=DELTA_HRS):
+    def __init__(
+        self,
+        source_name: str,
+        start_date: datetime.datetime = START_DATE,
+        end_date: datetime.datetime = END_DATE,
+        delta_hrs: int = DELTA_HRS,
+    ):
         """
         start_date(datetime object): Earliest day for which to look for results
         end_date(datetime object): Latest day for which to look for results
@@ -87,15 +93,15 @@ class WaybackCrawler(Crawler):
         super().__init__()
         self.session = WaybackSession()
         self.client = WaybackClient(self.session)
+        self.source_name = source_name
         self.prefix = "https://web.archive.org/"
         self.start_date = start_date
         self.end_date = end_date
         self.delta_hrs = delta_hrs
 
-    def crawl(self):
+    def get_wayback_urls(self):
         """
-        Crawl to obtain all the urls of articles contained in start_url in the different
-        stored versions in the internet archive between two dates.
+        Yield all wayback URLs between start_date and end_date
         """
         post_date_articles = set()
 
@@ -108,16 +114,8 @@ class WaybackCrawler(Crawler):
 
         # Crawl internet archive in gaps of at least delta_hrs
         while current_date < self.end_date:
-            # Get URL
-            waybackurl = record.view_url
-            articles = self.get_archive_urls(waybackurl, self.selector)
-            articles = [
-                memento_url_data(item)[0]
-                if ("/web/" in item or "web.archive.org" in item)
-                else item
-                for item in articles
-            ]
-            post_date_articles.update(articles)
+            yield ArticleURL(url=record.view_url, source=self.source_name)
+
             # If gap between fetched and next result is less than delta_hrs,
             # search the archive for the first results in at least delta_hrs
             try:
@@ -135,6 +133,20 @@ class WaybackCrawler(Crawler):
                 current_date = next_time
                 record = next_result
 
+    def crawl(self):
+        """
+        Crawl to obtain all the urls of articles contained in start_url in the different
+        stored versions in the internet archive between two dates.
+        """
+        waybackurl = record.view_url
+        articles = self.get_archive_urls(waybackurl, self.selector)
+        articles = [
+            memento_url_data(item)[0]
+            if ("/web/" in item or "web.archive.org" in item)
+            else item
+            for item in articles
+        ]
+        post_date_articles.update(articles)
         return post_date_articles
 
     def get_archive_urls(self, url, selectors):

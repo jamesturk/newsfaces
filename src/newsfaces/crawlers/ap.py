@@ -6,7 +6,7 @@ import pytz
 
 class AP(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("ap")
         self.start_url = ""
         self.selector = []
 

@@ -4,13 +4,11 @@ from newsfaces.utils import make_link_absolute
 
 class BreitbartCrawler(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("breitbart")
         self.start_url = "https://www.breitbart.com/politics/"
-        self.session = WaybackSession()
-        self.client = WaybackClient(self.session)
         self.selector = None
 
-    def get_archive_urls(self, url, selector=[""]):
+    def get_archive_urls(self, url):
         response = self.make_request(url)
         urls = []
         article_elements = response.cssselect("article")

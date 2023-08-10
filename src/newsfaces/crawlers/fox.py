@@ -6,7 +6,7 @@ import json
 
 class Fox(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("fox")
         self.start_url = "https://www.foxnews.com/politics"
         self.selector = ["article"]
 
