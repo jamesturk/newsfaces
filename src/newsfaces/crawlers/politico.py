@@ -113,9 +113,3 @@ class Politico_Extractor(Extractor):
 
     def extract_head_img(self, html, img_p_selector, img_selector):
         return []
-
-
-a = Politico_Extractor()
-a.scrape(
-    "https://www.politico.com/news/2023/08/07/bidenomics-white-house-economy-00109977"
-)
