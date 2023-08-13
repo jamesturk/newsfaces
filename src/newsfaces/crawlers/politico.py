@@ -95,4 +95,3 @@ class Politico_Extractor(Extractor):
                 )
                 imgs.append(img_item)
             return imgs
-
