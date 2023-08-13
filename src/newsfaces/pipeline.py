@@ -88,6 +88,7 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
 
 # the non-wayback crawlers are url -> response -> article
 for source, classes in SOURCE_MAPPING.items():
+    (crawler, extractor) = classes
     pipeline.add_beaker(f"url_{source}", ArticleURL)
     pipeline.add_seed(
         source, f"url_{source}", article_seed_wrapper(crawler.crawl, source)
