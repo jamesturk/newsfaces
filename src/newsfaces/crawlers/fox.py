@@ -50,5 +50,5 @@ class Fox_API(Crawler):
                 + articlenumber
                 + base_page[end : (len(base_page) + 1)]
             )
-            self.get_html(rev_basepage, article, video)
+            self.get_newslinks(rev_basepage, article, video)
         return article.union(video)
