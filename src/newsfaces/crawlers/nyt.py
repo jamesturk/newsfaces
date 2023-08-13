@@ -4,7 +4,7 @@ import json
 import requests
 import time
 
-nyt_api_key= ""
+nyt_api_key = ""
 POLITICS_SECTION = "politics"
 QUERY_LIST = [
     "Donald Trump",
