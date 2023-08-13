@@ -8,7 +8,7 @@ from newsfaces.utils import make_link_absolute
 import pytz
 
 DEFAULT_DELAY = 0.5
-START_DATE = datetime.datetime(2015, 1, 1, 0, 0, tzinfo=pytz.timezone("utc"))
+START_DATE = datetime.datetime(2020, 1, 1, 0, 0, tzinfo=pytz.timezone("utc"))
 END_DATE = datetime.datetime.now(pytz.timezone("utc"))
 DELTA_HRS = 6
 
@@ -76,37 +76,38 @@ class Crawler(object):
 
 
 class WaybackCrawler(Crawler):
-    def __init__(self):
+    def __init__(self, start_date=START_DATE, end_date=END_DATE, delta_hrs=DELTA_HRS):
+        """
+        start_date(datetime object): Earliest day for which to look for results
+        end_date(datetime object): Latest day for which to look for results
+        delta_hrs (int): Threshold of minimum number of hours between the
+        timestamp of consecutive internet archive results for which to look for
+        article urls.
+        """
         super().__init__()
         self.session = WaybackSession()
         self.client = WaybackClient(self.session)
         self.prefix = "https://web.archive.org/"
+        self.start_date = start_date
+        self.end_date = end_date
+        self.delta_hrs = delta_hrs
 
-    def crawl(self, start_date=START_DATE, end_date=END_DATE, delta_hrs=DELTA_HRS):
+    def crawl(self):
         """
         Crawl to obtain all the urls of articles contained in start_url in the different
         stored versions in the internet archive between two dates.
-
-        Inputs:
-        - start_date(datetime object): Earliest day for which to look for results
-        - end_date(datetime object): Latest day for which to look for results
-        -delta_hrs (int): Threshold of minimum number of hours between the
-                        timestamp of consecutive internet archive results
-                        for which to look for article urls.
-        Return:
-        - post_date_articles(set): Set of urls obtained from the crawling process
         """
         post_date_articles = set()
 
         # Get first result
-        current_date = start_date
+        current_date = self.start_date
         results = self.client.search(
             self.start_url, match_type="exact", from_date=current_date
         )
         record = next(results)
 
         # Crawl internet archive in gaps of at least delta_hrs
-        while current_date < end_date:
+        while current_date < self.end_date:
             # Get URL
             waybackurl = record.view_url
             articles = self.get_archive_urls(waybackurl, self.selector)
@@ -124,8 +125,8 @@ class WaybackCrawler(Crawler):
             except StopIteration:
                 break
             next_time = next_result.timestamp
-            if next_time - current_date < datetime.timedelta(hours=delta_hrs):
-                current_date += datetime.timedelta(hours=delta_hrs)
+            if next_time - current_date < datetime.timedelta(hours=self.delta_hrs):
+                current_date += datetime.timedelta(hours=self.delta_hrs)
                 results = self.client.search(
                     self.start_url, match_type="exact", from_date=current_date
                 )

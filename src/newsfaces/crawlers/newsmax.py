@@ -2,9 +2,10 @@ from .crawler import Crawler
 
 
 class NewsmaxCrawler(Crawler):
-    def __init__(self):
+    def __init__(self, min_year=2016):
         super().__init__()
         self.url = "https://www.newsmax.com/archives/politics/1/"
+        self.min_year = min_year
 
     def obtain_page_urls(self, year="2016", month="1"):
         """
@@ -26,7 +27,7 @@ class NewsmaxCrawler(Crawler):
             links_list.append(full_link)
         return links_list
 
-    def crawl(self, min_year=2016):
+    def crawl(self):
         """
         Obtain all newsmax urls from the politics section
         Inputs: None
@@ -34,7 +35,7 @@ class NewsmaxCrawler(Crawler):
         newsmax_links (dict): Dictionary where the keys are str for date (year-mth)
         and values are lists with the urls of that given key
         """
-        years = [*range(min_year, 2024, 1)]
+        years = [*range(self.min_year, 2024, 1)]
         months = [*range(1, 13, 1)]
         articles_set = set()
 

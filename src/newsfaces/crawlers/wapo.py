@@ -12,7 +12,7 @@ class WashingtonPost_API(Crawler):
         """
         run get_html with correct initial html from init
         """
-        return self.get_html(self.start_url)
+        return self.get_html(self.start_url)[0]  # only return articles for now
 
     def get_html(self, base_page, article=set(), video=set()):
         """

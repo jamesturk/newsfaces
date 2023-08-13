@@ -11,7 +11,7 @@ class BBC_Latest(Crawler):
         """
         run get_html with correct initial html from init
         """
-        return self.get_newslink(self.start_url)
+        return self.get_newslink(self.start_url)[0]
 
     def get_newslink(self, url, articles=set(), videos=set()):
         """
@@ -26,7 +26,7 @@ class BBC_Latest(Crawler):
         pagenumber = int(url[begin : len(url)])
         if pagenumber < 42:
             newlink = url[: -len(str(pagenumber))] + str(pagenumber + 1)
-            article, video = self.crawl(newlink, articles, videos)
+            article, video = self.get_newslink(newlink, articles, videos)
             articles = articles.union(article)
             videos = videos.union(video)
         return articles, videos
