@@ -101,7 +101,6 @@ class Extractor(object):
             return [img_item]
         except UnboundLocalError:
             return []
-            
 
     def extract_imgs(self, html, img_p_selector, img_selector):
         """

@@ -1,4 +1,3 @@
-from newsfaces.utils import make_link_absolute
 from .crawler import WaybackCrawler
 import datetime
 import pytz
@@ -39,7 +38,8 @@ class AP(WaybackCrawler):
             if len(container) > 0:
                 urls += self.parse_links(container)
         xpath_sel = ["TwoColumnContainer", "CardHeadline"]
-        # for items that have random characters continually added at the end so we do non-exact matching
+        # for items that have random characters continually added 
+        # at the end so we do non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@class, '{j}')]")
             if len(container) > 0:
@@ -77,13 +77,12 @@ class AP(WaybackCrawler):
         return urls
 
 
-
 class AP_Extractor(Extractor):
     def __init__(self):
         super().__init__()
 
         self.article_body = ["main.Page-main"]
-        self.img_p_selector = ["figure.Figure"] 
+        self.img_p_selector = ["figure.Figure"]
         self.img_selector = ["img"]
         self.head_img_div = ["div.Page-lead"]
         self.head_img_select = ["img"]
