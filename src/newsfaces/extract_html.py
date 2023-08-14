@@ -97,7 +97,11 @@ class Extractor(object):
                             alt_text=i.get("alt") or "",
                         )
                     break
-        return [img_item]
+        try:
+            return [img_item]
+        except UnboundLocalError:
+            return []
+            
 
     def extract_imgs(self, html, img_p_selector, img_selector):
         """

@@ -2,11 +2,14 @@ from newsfaces.utils import make_link_absolute
 from .crawler import WaybackCrawler
 import datetime
 import pytz
+from newsfaces.extract_html import Extractor
+from newsfaces.utils import make_link_absolute
 
 
 class AP(WaybackCrawler):
     def __init__(self):
         super().__init__()
+        self.urls = ["https://apnews.com/politics", "https://apnews.com/hub/politics"]
         self.start_url = ""
         self.selector = []
 
@@ -36,8 +39,7 @@ class AP(WaybackCrawler):
             if len(container) > 0:
                 urls += self.parse_links(container)
         xpath_sel = ["TwoColumnContainer", "CardHeadline"]
-        # for items that have random characters continually added at
-        # the end so we do non-exact matching
+        # for items that have random characters continually added at the end so we do non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@class, '{j}')]")
             if len(container) > 0:
@@ -45,15 +47,17 @@ class AP(WaybackCrawler):
 
         return urls
 
-    def crawl(self):
-        self.start_url = "https://apnews.com/politics"
-        change_date = datetime.datetime(2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc"))
-        if self.start_date < change_date:
-            self.start_url = "https://apnews.com/hub/politics"
-            self.end_date = change_date
-            hub_site = super().crawl()
+    def crawl(self, startdate, enddate, delta_hrs=6):
+        if startdate < datetime.datetime(
+            2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc")
+        ):
+            self.start_url = self.urls[1]
+            changepage_date = datetime.datetime(
+                2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc")
+            )
+            hub_site = super().crawl(startdate, changepage_date, delta_hrs)
         self.start_url = self.urls[0]
-        current_site = super().crawl()
+        current_site = super().crawl(startdate, enddate, delta_hrs)
         return hub_site.union(current_site)
 
     def parse_links(self, container):
@@ -71,3 +75,17 @@ class AP(WaybackCrawler):
                         href = make_link_absolute(href, "https://web.archive.org")
                     urls.append(href)
         return urls
+
+
+
+class AP_Extractor(Extractor):
+    def __init__(self):
+        super().__init__()
+
+        self.article_body = ["main.Page-main"]
+        self.img_p_selector = ["figure.Figure"] 
+        self.img_selector = ["img"]
+        self.head_img_div = ["div.Page-lead"]
+        self.head_img_select = ["img"]
+        self.p_selector = ["p"]
+        self.t_selector = ["h1.Page-headline"]
