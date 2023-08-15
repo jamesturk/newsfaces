@@ -1,6 +1,6 @@
 import re
 import datetime
-from .crawler import Crawler
+from ..crawler import Crawler
 from ..utils import make_link_absolute
 
 

@@ -1,5 +1,5 @@
 # Util Functions
-from .crawler import WaybackCrawler
+from ..crawler import WaybackCrawler
 import re
 
 url = "https://www.nbcnews.com/politics/"
@@ -11,7 +11,7 @@ class NBC(WaybackCrawler):
         self.start_url = "https://www.nbcnews.com/politics/"
         self.selector = []
 
-    def get_archive_urls(self, url, selectors):
+    def get_article_urls(self, archive_url):
         """
         Implement get_archive_urls here to override behavior
         """

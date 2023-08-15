@@ -1,4 +1,4 @@
-from .crawler import Crawler, WaybackCrawler
+from ..crawler import Crawler, WaybackCrawler
 from newsfaces.utils import make_link_absolute
 
 
@@ -69,26 +69,15 @@ class BBC(WaybackCrawler):
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t"
         self.selector = ["div.archive__item__content", "h2.node__title.node-title"]
 
-    def get_archive_urls(self, url, selector):
-        return self.get(url)
-
-    def get(self, url, articles=set(), videos=set()):
-        """
-        This function takes a URLs and returns lists of URLs
-        for containing each article and video on that page.
-
-        Parameters:
-            * url:  a URL to a page of articles
-
-        Returns:
-            A list of URLs to each video and article on that page.
-        """
-        response = self.make_request(url)
+    def get_article_urls(self, response):
+        doc = lxml.html.fromstring(response.text)
         xpath_sel = ["article", "video"]
+        articles = set()
+        videos = set()
         # for items that have random characters continually added at the
         # end so we do non-exact matching
         for j in xpath_sel:
-            container = response.xpath(f"//div[contains(@type, '{j}')]")
+            container = doc.xpath(f"//div[contains(@type, '{j}')]")
             if container:
                 for j in container:
                     a = j[0].cssselect("a")

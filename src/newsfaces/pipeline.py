@@ -1,6 +1,9 @@
-from databeakers.pipeline import Pipeline, ErrorType
+from databeakers.pipeline import Pipeline
+from databeakers.beakers import TempBeaker
 from databeakers.http import HttpResponse, HttpRequest
-from databeakers.transforms import RateLimit
+from databeakers.transforms import RateLimit, Conditional
+from databeakers._record import Record
+from pydantic import BaseModel
 import httpx
 from .models import ArticleURL, Article
 from .crawlers import (
@@ -11,7 +14,6 @@ from .crawlers import (
     CnnCrawler,
     DailyCrawler,
     Fox,
-    # we do need both fox scrapers
     Fox_API,
     TheHill,
     NBC,
@@ -64,6 +66,23 @@ SOURCE_MAPPING = {
 }
 
 
+def make_comparator(source: str):
+    def fn(record: Record) -> bool:
+        return record["archive_url"].source == source
+
+    fn.__name__ = f"is_{source}"
+
+    return fn
+
+
+def make_extractor(beaker_name: str, fn):
+    def new_fn(record: Record) -> BaseModel:
+        yield from fn(record[beaker_name])
+
+    new_fn.__name__ = fn.__name__
+    return new_fn
+
+
 for source, classes in WAYBACK_SOURCE_MAPPING.items():
     (crawler, extractor) = classes
 
@@ -84,18 +103,28 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
         },
     )
 
-    # TODO: populate url_{source} with the archive urls
+    pipeline.add_beaker(f"{source}_url", ArticleURL)
+    # TODO: make_comparator could become Conditional(field="source", value=source) with a bit of work
+    pipeline.add_transform(
+        f"archive_response",
+        f"{source}_url",
+        Conditional(
+            make_extractor("archive_response", crawler.get_article_urls),
+            make_comparator(source),
+        ),
+        whole_record=True,
+    )
 
 # the non-wayback crawlers are url -> response -> article
 for source, classes in SOURCE_MAPPING.items():
     (crawler, extractor) = classes
-    pipeline.add_beaker(f"url_{source}", ArticleURL)
+    pipeline.add_beaker(f"{source}_url", ArticleURL)
     pipeline.add_seed(
-        source, f"url_{source}", article_seed_wrapper(crawler.crawl, source)
+        source, f"{source}_url", article_seed_wrapper(crawler.crawl, source)
     ),
     pipeline.add_transform(
-        f"url_{source}",
-        f"response_{source}",
+        f"{source}_url",
+        f"{source}_response",
         HttpRequest(),
     )
     # TODO: uncomment once extractors are in place

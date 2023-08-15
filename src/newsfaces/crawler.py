@@ -3,9 +3,11 @@ import requests
 import datetime
 import lxml.html
 import pytz
+from typing import Generator
 from wayback import WaybackClient, memento_url_data, WaybackSession
-from ..utils import make_link_absolute
-from ..models import ArticleURL
+from .utils import make_link_absolute
+from .models import ArticleURL
+from databeakers.http import HttpResponse
 
 DEFAULT_DELAY = 0.5
 START_DATE = datetime.datetime(2020, 1, 1, 0, 0, tzinfo=pytz.timezone("utc"))
@@ -18,7 +20,7 @@ class Crawler:
         self.session = requests.Session()
         self.delay = DEFAULT_DELAY
         self.start_url = ""
-        self.selectors = []
+        self.selector = []
         self.prefix = None
 
     def http_get(self, url):
@@ -45,24 +47,26 @@ class Crawler:
         """
         Crawl the site and return a list of URLs to be scraped.
         """
-        return self.get_urls(self.start_url, self.selectors)
+        return self.get_urls(self.start_url, self.selector)
 
-    def get_urls(self, url, selectors):
+    def get_article_urls(
+        self, response: HttpResponse
+    ) -> Generator[ArticleURL, None, None]:
         """
-        This function takes a URLs and returns lists of URLs
-        for containing each article on that page.
+        This function takes a response & a list of css selectors and returns
+        a list of URLs.
 
         Parameters:
-            * url:  a URL to a page of articles
+            * response: a response object
             * selectors: a list of css selectors
 
         Returns:
             A list of article URLs on that page.
         """
-        response = self.make_request(url)
+        doc = lxml.html.fromstring(response.response_body)
         urls = []
-        for selector in selectors:
-            container = response.cssselect(selector)
+        for selector in self.selector:
+            container = doc.cssselect(selector)
             for j in container:
                 atr = j.cssselect("a")
                 if atr and len(atr) > 0:
@@ -103,56 +107,45 @@ class WaybackCrawler(Crawler):
         """
         Yield all wayback URLs between start_date and end_date
         """
-        post_date_articles = set()
-
-        # Get first result
         current_date = self.start_date
+
+        # get first result
+        # each search result will contain multiple URLs
         results = self.client.search(
             self.start_url, match_type="exact", from_date=current_date
         )
-        record = next(results)
 
-        # Crawl internet archive in gaps of at least delta_hrs
         while current_date < self.end_date:
-            yield ArticleURL(url=record.view_url, source=self.source_name)
-
-            # If gap between fetched and next result is less than delta_hrs,
-            # search the archive for the first results in at least delta_hrs
+            # get a new record and yield the URL
             try:
-                next_result = next(results)
+                record = next(results)
             except StopIteration:
                 break
-            next_time = next_result.timestamp
+
+            next_time = record.timestamp
+
+            # if the next result is too close, skip it
             if next_time - current_date < datetime.timedelta(hours=self.delta_hrs):
                 current_date += datetime.timedelta(hours=self.delta_hrs)
                 results = self.client.search(
                     self.start_url, match_type="exact", from_date=current_date
                 )
-                record = next(results)
+                continue
+
+            # yield back the article URL and update the date cursor
+            yield ArticleURL(url=record.view_url, source=self.source_name)
+            current_date = next_time
+
+    def get_article_urls(
+        self, response: HttpResponse
+    ) -> Generator[ArticleURL, None, None]:
+        """
+        Get all article URLs from a wayback URL
+        """
+        articles = super().get_article_urls(response)
+        # convert to normal URLs
+        for item in articles:
+            if "/web/" in item or "web.archive.org" in item:
+                yield ArticleURL(url=memento_url_data(item)[0], source=self.source_name)
             else:
-                current_date = next_time
-                record = next_result
-
-    def crawl(self):
-        """
-        Crawl to obtain all the urls of articles contained in start_url in the different
-        stored versions in the internet archive between two dates.
-        """
-        waybackurl = record.view_url
-        articles = self.get_archive_urls(waybackurl, self.selector)
-        articles = [
-            memento_url_data(item)[0]
-            if ("/web/" in item or "web.archive.org" in item)
-            else item
-            for item in articles
-        ]
-        post_date_articles.update(articles)
-        return post_date_articles
-
-    def get_archive_urls(self, url, selectors):
-        """
-        might be overriden in child class
-        """
-        articles = self.get_urls(url, selectors)
-
-        return articles
+                yield ArticleURL(url=item, source=self.source_name)

@@ -1,7 +1,8 @@
 from newsfaces.utils import make_link_absolute
-from .crawler import WaybackCrawler
+from ..crawler import WaybackCrawler
 import datetime
 import pytz
+import lxml.html
 
 
 class AP(WaybackCrawler):
@@ -10,7 +11,7 @@ class AP(WaybackCrawler):
         self.start_url = ""
         self.selector = []
 
-    def get_archive_urls(self, url, selectors):
+    def get_archive_urls(self, response):
         """
         This function takes a URLs and returns lists of URLs
         for containing each article on that page.
@@ -23,7 +24,7 @@ class AP(WaybackCrawler):
         Returns:
             A list of article URLs on that page.
         """
-        response = self.make_request(url)
+        doc = lxml.html.fromstring(response.text)
         urls = []
         selectors = [
             "div.FourColumnContainer-column",
@@ -32,7 +33,7 @@ class AP(WaybackCrawler):
             "article",
         ]
         for a in selectors:
-            container = response.cssselect(a)
+            container = doc.cssselect(a)
             if len(container) > 0:
                 urls += self.parse_links(container)
         xpath_sel = ["TwoColumnContainer", "CardHeadline"]

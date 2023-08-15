@@ -1,6 +1,6 @@
 # Util Functions
 from newsfaces.utils import make_link_absolute
-from .crawler import Crawler, WaybackCrawler
+from ..crawler import Crawler, WaybackCrawler
 import json
 
 

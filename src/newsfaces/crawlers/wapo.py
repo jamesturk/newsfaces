@@ -1,5 +1,5 @@
 import json
-from .crawler import Crawler, WaybackCrawler
+from ..crawler import Crawler, WaybackCrawler
 from newsfaces.utils import make_link_absolute
 
 
@@ -58,8 +58,8 @@ class WashingtonPost(WaybackCrawler):
         self.start_url = "https://www.washingtonpost.com/politics/"
         self.selector = ["div.story-headline.pr-sm"]
 
-    def get_archive_urls(self, url, selectors):
-        articles = super().get_archive_urls(url, selectors)
+    def get_article_urls(self, response):
+        articles = super().get_article_urls(response)
         filtered_articles = [
             article
             for article in articles

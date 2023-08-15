@@ -1,7 +1,7 @@
 # Util Functions
 from newsfaces.extract_html import Extractor
 from newsfaces.utils import make_link_absolute, page_grab
-from newsfaces.crawlers.crawler import Crawler
+from newsfaces.crawler import Crawler
 from newsfaces.models import Image, Article, ImageType
 
 
