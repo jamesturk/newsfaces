@@ -1,11 +1,12 @@
 import re
 import datetime
 from .crawler import Crawler
-from ..utils import make_link_absolute, page_grab
-from ..extract_html import Extractor 
+from ..utils import make_link_absolute
+from ..extract_html import Extractor
 from ..models import Image, ImageType
 
 CURRENT_YEAR = datetime.datetime.now().year
+
 
 class DailyCrawler(Crawler):
     def __init__(self):
@@ -61,7 +62,7 @@ class DailyCrawler(Crawler):
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
         min_year = start_date.year
-        years = list(range(min_year, CURRENT_YEAR+1, 1))
+        years = list(range(min_year, CURRENT_YEAR + 1, 1))
         page = 1
         articles_set = set()
         for year in reversed(years):
@@ -71,6 +72,7 @@ class DailyCrawler(Crawler):
             page += 1
 
         return articles_set
+
 
 class DailyExtractor(Extractor):
     def __init__(self):
@@ -82,13 +84,14 @@ class DailyExtractor(Extractor):
         self.head_img_select = ["img"]
         self.p_selector = ["p"]
         self.t_selector = ["h1"]
-    
+
     def extract_head_img(self, html, img_p_selector, img_selector):
         """
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_p_selector(list): list of css selector for the parent elements
+              of images in articles
             - img_selector(list): list of css selector for the image elements
             Return:
             -imgs(lst): list where each element is an image represented as a dictionary
@@ -99,33 +102,35 @@ class DailyExtractor(Extractor):
         head_img = img_container.cssselect(img_selector[0])[0]
 
         img_item = Image(
-                        url=head_img.get("data-src") or "",
-                        image_type=ImageType("main"),    
-                        caption=head_img.get("caption") or "",
-                        alt_text=head_img.get("alt") or "",
-                        )
-                    
+            url=head_img.get("data-src") or "",
+            image_type=ImageType("main"),
+            caption=head_img.get("caption") or "",
+            alt_text=head_img.get("alt") or "",
+        )
+
         return [img_item]
-    
+
     def extract_imgs(self, html, img_p_selector, img_selector):
         """
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_p_selector(list): list of css selector for the parent elements
+              of images in articles
             - img_selector(list): css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as an image object
+            -imgs(lst): list where each element is an image represented as
+            an image object
         """
         imgs = []
 
-        #Daily has only one image selector over the years, so avoid iterating
+        # Daily has only one image selector over the years, so avoid iterating
         img_container = html.cssselect(img_p_selector[0])
 
-        #Obtain img info and captions which in the Daily both live inside the
-        #same parent element (img_container)
+        # Obtain img info and captions which in the Daily both live inside the
+        # same parent element (img_container)
         for container in img_container:
-            caption= container.cssselect("p.wp-caption-text")[0].text 
+            caption = container.cssselect("p.wp-caption-text")[0].text
             for j in img_selector:
                 photos = container.cssselect(j)
                 for i in photos:
@@ -136,5 +141,5 @@ class DailyExtractor(Extractor):
                         alt_text=i.get("alt") or "",
                     )
                 imgs.append(img_item)
-        
+
         return imgs
