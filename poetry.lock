@@ -426,20 +426,6 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
-name = "click-default-group-wheel"
-version = "1.2.2"
-description = "Extends click.Group to invoke a command without explicit subcommand name (packaged as a wheel)"
-optional = false
-python-versions = "*"
-files = [
-    {file = "click-default-group-wheel-1.2.2.tar.gz", hash = "sha256:e90da42d92c03e88a12ed0c0b69c8a29afb5d36e3dc8d29c423ba4219e6d7747"},
-    {file = "click_default_group_wheel-1.2.2-py3-none-any.whl", hash = "sha256:1599b0b6e0ff63ee806c2cb76593cb8cc73e723cd53532c92bc496dc6fc90e5c"},
-]
-
-[package.dependencies]
-click = "*"
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -482,27 +468,26 @@ files = [
 
 [[package]]
 name = "databeakers"
-version = "0.1.2"
+version = "0.2.1"
 description = ""
 optional = false
-python-versions = "^3.10"
-files = []
-develop = true
+python-versions = ">=3.10,<4.0"
+files = [
+    {file = "databeakers-0.2.1-py3-none-any.whl", hash = "sha256:52315bb7a96f768c9e3015199b217d5afd852e59388b1b973b946fbb0ec21730"},
+    {file = "databeakers-0.2.1.tar.gz", hash = "sha256:60879eca2d033605fef53f35b2d068414d7997056111dc14f4a1e0506292a3b4"},
+]
 
 [package.dependencies]
-httpx = "^0.24.0"
-networkx = "^3.1"
-pydantic = "^2.0.2"
-pydantic-settings = "^2.0.2"
-rich = "^13.4.2"
-scrapelib = "^2.1.0"
-structlog = "^23.1.0"
-toml = "^0.10.2"
-typer = "^0.9.0"
-
-[package.source]
-type = "directory"
-url = "../beakers"
+httpx = ">=0.24.0,<0.25.0"
+networkx = ">=3.1,<4.0"
+pydantic = ">=2.0.2,<3.0.0"
+pydantic-settings = ">=2.0.2,<3.0.0"
+pydot = ">=1.4.2,<2.0.0"
+rich = ">=13.4.2,<14.0.0"
+scrapelib = ">=2.1.0,<3.0.0"
+structlog = ">=23.1.0,<24.0.0"
+toml = ">=0.10.2,<0.11.0"
+typer = ">=0.9.0,<0.10.0"
 
 [[package]]
 name = "debugpy"
@@ -1597,21 +1582,6 @@ docs = ["furo (>=2023.5.20)", "proselint (>=0.13)", "sphinx (>=7.0.1)", "sphinx-
 test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.3.1)", "pytest-cov (>=4.1)", "pytest-mock (>=3.10)"]
 
 [[package]]
-name = "pluggy"
-version = "1.2.0"
-description = "plugin and hook calling mechanisms for python"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pluggy-1.2.0-py3-none-any.whl", hash = "sha256:c2fd55a7d7a3863cba1a013e4e2414658b1d07b6bc57b3919e0c63c9abb99849"},
-    {file = "pluggy-1.2.0.tar.gz", hash = "sha256:d12f0c4b579b15f5e054301bb226ee85eeeba08ffec228092f8defbaa3a4c4b3"},
-]
-
-[package.extras]
-dev = ["pre-commit", "tox"]
-testing = ["pytest", "pytest-benchmark"]
-
-[[package]]
 name = "prometheus-client"
 version = "0.17.1"
 description = "Python client for the Prometheus monitoring system."
@@ -2434,46 +2404,6 @@ files = [
 ]
 
 [[package]]
-name = "sqlite-fts4"
-version = "1.0.3"
-description = "Python functions for working with SQLite FTS4 search"
-optional = false
-python-versions = "*"
-files = [
-    {file = "sqlite-fts4-1.0.3.tar.gz", hash = "sha256:78b05eeaf6680e9dbed8986bde011e9c086a06cb0c931b3cf7da94c214e8930c"},
-    {file = "sqlite_fts4-1.0.3-py3-none-any.whl", hash = "sha256:0359edd8dea6fd73c848989e1e2b1f31a50fe5f9d7272299ff0e8dbaa62d035f"},
-]
-
-[package.extras]
-test = ["pytest"]
-
-[[package]]
-name = "sqlite-utils"
-version = "3.34"
-description = "CLI tool and Python library for manipulating SQLite databases"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "sqlite-utils-3.34.tar.gz", hash = "sha256:4607683cbb32cfd4f3c63929045eaa020ab0221c5036f9bb41b7b25bc755cd23"},
-    {file = "sqlite_utils-3.34-py3-none-any.whl", hash = "sha256:234c2a3245e43ea7da588c1a879904e4b139f44ef621f5a9376d737a67e6077f"},
-]
-
-[package.dependencies]
-click = "*"
-click-default-group-wheel = "*"
-pluggy = "*"
-python-dateutil = "*"
-sqlite-fts4 = "*"
-tabulate = "*"
-
-[package.extras]
-docs = ["beanbag-docutils (>=2.0)", "codespell", "furo", "pygments-csv-lexer", "sphinx-autobuild", "sphinx-copybutton"]
-flake8 = ["flake8"]
-mypy = ["data-science-types", "mypy", "types-click", "types-pluggy", "types-python-dateutil", "types-tabulate"]
-test = ["black", "cogapp", "hypothesis", "pytest"]
-tui = ["trogon"]
-
-[[package]]
 name = "stack-data"
 version = "0.6.2"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -2508,20 +2438,6 @@ dev = ["structlog[docs,tests,typing]"]
 docs = ["furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-mermaid", "twisted"]
 tests = ["coverage[toml]", "freezegun (>=0.2.8)", "pretend", "pytest (>=6.0)", "pytest-asyncio (>=0.17)", "simplejson"]
 typing = ["mypy", "rich", "twisted"]
-
-[[package]]
-name = "tabulate"
-version = "0.9.0"
-description = "Pretty-print tabular data"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f"},
-    {file = "tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c"},
-]
-
-[package.extras]
-widechars = ["wcwidth"]
 
 [[package]]
 name = "terminado"
@@ -2762,4 +2678,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1ca93e3d13f28b7e4d0a5430dccb1ee17d23783f39a2eda9e6c0711f400cbd06"
+content-hash = "8e0a517e942bac9aa132fa1e2e8cd06f71e59ba31472ee0fdffff1fd67d079e3"
