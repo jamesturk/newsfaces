@@ -1,5 +1,5 @@
 # Util Functions
-from newsfaces.utils import make_link_absolute, page_grab
+from newsfaces.utils import make_link_absolute
 from .crawler import Crawler, WaybackCrawler
 import json
 
@@ -16,7 +16,13 @@ class Fox_API(Crawler):
         super().__init__()
         self.start_url = "https://www.foxnews.com/api/article-search?searchBy=categories&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
 
-    def crawl(self, base_page, article=set(), video=set()):
+    def crawl(self):
+        """
+        run get_html with correct initial html from init
+        """
+        return self.get_newslinks(self.start_url)
+
+    def get_newslinks(self, base_page, article=set(), video=set()):
         """
         From an initial API query page, run through all possible
         API queries-- putting articles and videos on the pages into
@@ -25,9 +31,8 @@ class Fox_API(Crawler):
         Returns:
         Set of articles and videos
         """
-        response = page_grab(base_page)
+        response = self.http_get(base_page)
         json_data = json.loads(response.text)
-        json_data
         for i in json_data:
             url = make_link_absolute(i["url"], "https://www.foxnews.com/politics")
             if url.startswith("https://www.foxnews.com/politics"):
@@ -45,5 +50,5 @@ class Fox_API(Crawler):
                 + articlenumber
                 + base_page[end : (len(base_page) + 1)]
             )
-            self.crawl(rev_basepage, article, video)
+            self.get_newslinks(rev_basepage, article, video)
         return article.union(video)

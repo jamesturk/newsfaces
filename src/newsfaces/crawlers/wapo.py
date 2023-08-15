@@ -1,6 +1,6 @@
 import json
 from .crawler import Crawler, WaybackCrawler
-from newsfaces.utils import make_link_absolute, make_request
+from newsfaces.utils import make_link_absolute
 
 
 class WashingtonPost_API(Crawler):
@@ -8,7 +8,13 @@ class WashingtonPost_API(Crawler):
         super().__init__()
         self.start_url = "https://www.washingtonpost.com/prism/api/prism-query?_website=washpost&query=%7B%22query%22%3A%22prism%3A%2F%2Fprism.query%2Fsite-articles-only%2C%2Fpolitics%26offset%3D600%26limit%3D30%22%7D"
 
-    def crawl(self, base_page, article=set(), video=set()):
+    def crawl(self):
+        """
+        run get_html with correct initial html from init
+        """
+        return self.get_html(self.start_url)[0]  # only return articles for now
+
+    def get_html(self, base_page, article=set(), video=set()):
         """
         From an initial API query page, run through all possible
         API queries-- putting articles on the pages into
@@ -17,7 +23,7 @@ class WashingtonPost_API(Crawler):
         Returns:
         Set of articles
         """
-        response = make_request(base_page)
+        response = self.http_get(base_page)
         json_data = json.loads(response.text)
         for i in range(len(json_data)):
             url_text = json_data["items"][i]["canonical_url"]
@@ -42,7 +48,7 @@ class WashingtonPost_API(Crawler):
                 + articlenumber
                 + base_page[end : (len(base_page) + 1)]
             )
-            article, video = self.crawl(rev_basepage, article, video)
+            article, video = self.get_html(rev_basepage, article, video)
         return article, video
 
 

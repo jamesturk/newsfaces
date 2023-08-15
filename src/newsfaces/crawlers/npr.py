@@ -80,6 +80,7 @@ class NprCrawler(Crawler):
         return month_urls
 
     def crawl(self, start_time=datetime.date(2015, 1, 1)):
+
         """
         Crawl the NPR politics section
         Inputs:

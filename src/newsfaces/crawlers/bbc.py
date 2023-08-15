@@ -7,14 +7,18 @@ class BBC_Latest(Crawler):
         super().__init__()
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t?page=1"
 
-    def crawl(self, url=None, articles=set(), videos=set()):
+    def crawl(self):
+        """
+        run get_html with correct initial html from init
+        """
+        return self.get_newslink(self.start_url)[0]
+
+    def get_newslink(self, url, articles=set(), videos=set()):
         """
         Takes an initial url and runs get_urls on all possible
         API queries. Gathering all possible articles and videos
         from the API into a set.
         """
-        if url is None:
-            url = self.start_url
         article, video = self.get_urls(url)
         articles = articles.union(article)
         videos = videos.union(video)
@@ -22,7 +26,7 @@ class BBC_Latest(Crawler):
         pagenumber = int(url[begin : len(url)])
         if pagenumber < 42:
             newlink = url[: -len(str(pagenumber))] + str(pagenumber + 1)
-            article, video = self.crawl(newlink, articles, videos)
+            article, video = self.get_newslink(newlink, articles, videos)
             articles = articles.union(article)
             videos = videos.union(video)
         return articles, videos
@@ -38,7 +42,7 @@ class BBC_Latest(Crawler):
         Returns:
             A list of URLs to each video and article on that page.
         """
-        response = page_grab(url)
+        response = self.make_request(url)
         container = response.cssselect("div")
         filtered_container = [
             elem for elem in container if elem.get("type") is not None
@@ -79,23 +83,19 @@ class BBC(WaybackCrawler):
         Returns:
             A list of URLs to each video and article on that page.
         """
-        response = page_grab(url)
-        container = response.cssselect("div")
-        filtered_container = [
-            elem for elem in container if elem.get("type") is not None
-        ]
-
-        for j in filtered_container:
-            # find video/article
-            type = j.get("type")
-            # find link
-            if type == "article" or type == "video":
-                a = j[0].cssselect("a")
-                href = a[0].get("href")
-                href = make_link_absolute(href, " https://web.archive.org")
-            if type == "article":
-                articles.add(href)
-            elif type == "video":
-                videos.add(href)
-        print(articles)
+        response = self.make_request(url)
+        xpath_sel = ["article", "video"]
+        # for items that have random characters continually added at the
+        # end so we do non-exact matching
+        for j in xpath_sel:
+            container = response.xpath(f"//div[contains(@type, '{j}')]")
+            if container:
+                for j in container:
+                    a = j[0].cssselect("a")
+                    href = a[0].get("href")
+                    href = make_link_absolute(href, "https://web.archive.org")
+                    if j == "article":
+                        articles.add(href)
+                    else:
+                        videos.add(href)
         return articles.union(videos)
