@@ -1,33 +1,56 @@
 # newsfaces
 
-Work in Progress
 
-## Example Session
+## Usage
 
-Parameters TBD, but to give a rough idea of usage:
+## Helpful Commands
 
-```
-$ newsfaces scrape cnn
-fetched 10000 articles in 3:00:00
-  2000 returned errors
-  8000 were fetched successfully
+`beaker show` to see the current state of the database.
 
-$ newsfaces extract
-processed 8000 articles in 0:20:00
-  1000 had no images
-  12000 images extracted from 7000 articles
+## 1. Seeds
 
-$ newsfaces identify
-processed 12000 images in 0:40:00
-  1000 -> h_clinton
-  1000 -> m_rubio
-  2000 -> no_face
-  2000 -> unknown_face
-  3000 -> d_trump
-  3000 -> j_biden
+To work on a particular source, you'll need to start by running a seed
+to get some initial data.
 
-$ newsfaces browse
-opening http://localhost:9999
-(opens an interface where we can visually examine results)
-```
+`beaker seeds` will list all the available seeds.
+
+`beaker seed <seed_name>` will run the seed.
+
+For test purposes, it is useful to run `beaker seed <seed_name> -rn 100`
+
+* -r resets the seed first, useful for testing
+* -n <number> will limit the number of records created, allowing you to test with a smaller dataset
+
+## 2a. Running an archive-based crawl
+
+Archive-based crawlers:
+
+* bbc_archive
+* cnn
+* fox
+* nbc
+* wapo
+* breitbart
+* hill
+* washtimes
+
+These crawlers populate `archive_url`.
+
+`bkr run --only archive_url` will process all archive_urls (converting them to archive_responses).
+
+`bkr run --only archive_response` will process all archive_responses (converting them to <source>_urls).
+
+Tip: Run `bkr show -w` in another terminal to see the database update in real time.
+
+Tip: You can run both of these at once by passing `--only archive_url --only archive_response`.
+
+## 2b. Running extractors
+
+If you are using a non-archive-based crawler, the seed populated a beaker called <source>_urls.
+
+If you are using an archive-based crawler, step 2a will have populated a beaker called <source>_urls.
+
+`bkr run --only <source>_url` will process all <source>_urls (converting them to <source>_responses).
+
+`bkr run --only <source>_response` will process all <source>_responses (converting them to articles).
 
