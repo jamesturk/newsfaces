@@ -1,3 +1,4 @@
+import itertools
 from databeakers.pipeline import Pipeline
 from databeakers.beakers import TempBeaker
 from databeakers.http import HttpResponse, HttpRequest
@@ -45,11 +46,11 @@ pipeline = Pipeline("newsfaces", "newsfaces.db")
 
 WAYBACK_SOURCE_MAPPING = {
     "ap": (AP(), None),
-    "bbc_archive": (BBC(), None),
-    "cnn": (CnnCrawler(), None),
+    # "bbc_archive": (BBC(), None),
+    # "cnn": (CnnCrawler(), None),
     "fox": (Fox(), None),
-    "nbc": (NBC(), None),
-    "wapo": (WashingtonPost(), None),
+    # "nbc": (NBC(), None),
+    # "wapo": (WashingtonPost(), None),
     "breitbart": (BreitbartCrawler(), None),
     "hill": (TheHill(), None),
     "washtimes": (WashingtonTimes(), None),
@@ -57,12 +58,12 @@ WAYBACK_SOURCE_MAPPING = {
 
 SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
-    "daily": (DailyCrawler(), None),
+    # "daily": (DailyCrawler(), None),
     "fox_api": (Fox_API(), None),
     "newsmax": (NewsmaxCrawler(2021), None),
-    "npr": (NprCrawler(), None),
-    "politico": (Politico(), None),
-    "wapo_api": (WashingtonPost_API(), None),
+    # "npr": (NprCrawler(), None),
+    # "politico": (Politico(), None),
+    # "wapo_api": (WashingtonPost_API(), None),
 }
 
 
@@ -83,6 +84,7 @@ def make_extractor(beaker_name: str, fn):
     return new_fn
 
 
+# wayback crawlers all process through the archive_url beaker
 for source, classes in WAYBACK_SOURCE_MAPPING.items():
     (crawler, extractor) = classes
 
@@ -115,18 +117,28 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
         whole_record=True,
     )
 
-# the non-wayback crawlers are url -> response -> article
+# the non-wayback crawlers seed right into URL
 for source, classes in SOURCE_MAPPING.items():
     (crawler, extractor) = classes
     pipeline.add_beaker(f"{source}_url", ArticleURL)
     pipeline.add_seed(
         source, f"{source}_url", article_seed_wrapper(crawler.crawl, source)
-    ),
+    )
+
+# this part is the same for both
+# url -> response -> article
+for source, classes in itertools.chain(
+    WAYBACK_SOURCE_MAPPING.items(), SOURCE_MAPPING.items()
+):
+    (crawler, extractor) = classes
     pipeline.add_transform(
         f"{source}_url",
         f"{source}_response",
         HttpRequest(),
+        error_map={
+            (httpx.ReadTimeout,): "timeouts",
+            (httpx.RequestError,): "errors",
+        },
     )
-    # TODO: uncomment once extractors are in place
-    # pipeline.add_beaker(f"article_{source}", Article)
-    # pipeline.add_transform(f"response_{source}", f"article_{source}", extractor)
+    if extractor:
+        pipeline.add_transform(f"{source}_response", f"{source}_article", extractor)
