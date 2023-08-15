@@ -19,6 +19,7 @@ from .crawlers import (
     NBC,
     NewsmaxCrawler,
     NprCrawler,
+    NYTCrawler,
     Politico,
     WashingtonPost,
     WashingtonPost_API,
@@ -44,25 +45,26 @@ pipeline = Pipeline("newsfaces", "newsfaces.db")
 
 
 WAYBACK_SOURCE_MAPPING = {
-    "ap": (AP(), None),
-    # "bbc_archive": (BBC(), None),
-    # "cnn": (CnnCrawler(), None),
-    "fox": (Fox(), None),
-    # "nbc": (NBC(), None),
-    # "wapo": (WashingtonPost(), None),
+    # "ap": (AP(), None),
+    "bbc_archive": (BBC(), None),
     "breitbart": (BreitbartCrawler(), None),
+    "cnn": (CnnCrawler(), None),
+    "fox": (Fox(), None),
     "hill": (TheHill(), None),
+    "nbc": (NBC(), None),
+    "wapo": (WashingtonPost(), None),
     "washtimes": (WashingtonTimes(), None),
 }
 
 SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
-    # "daily": (DailyCrawler(), None),
+    "daily": (DailyCrawler(), None),
     "fox_api": (Fox_API(), None),
     "newsmax": (NewsmaxCrawler(2021), None),
-    # "npr": (NprCrawler(), None),
-    # "politico": (Politico(), None),
-    # "wapo_api": (WashingtonPost_API(), None),
+    "npr": (NprCrawler(), None),
+    "nyt": (NYTCrawler(), None),
+    "politico": (Politico(), None),
+    "wapo_api": (WashingtonPost_API(), None),
 }
 
 

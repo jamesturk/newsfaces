@@ -5,6 +5,7 @@ import lxml.html
 import pytz
 from typing import Generator
 from wayback import WaybackClient, memento_url_data, WaybackSession
+from structlog import get_logger
 from .utils import make_link_absolute
 from .models import ArticleURL
 from databeakers.http import HttpResponse
@@ -13,6 +14,8 @@ DEFAULT_DELAY = 0.5
 START_DATE = datetime.datetime(2020, 1, 1, 0, 0, tzinfo=pytz.timezone("utc"))
 END_DATE = datetime.datetime.now(pytz.timezone("utc"))
 DELTA_HRS = 6
+
+log = get_logger()
 
 
 class Crawler:
@@ -107,34 +110,32 @@ class WaybackCrawler(Crawler):
         """
         Yield all wayback URLs between start_date and end_date
         """
-        current_date = self.start_date
 
-        # get first result
-        # each search result will contain multiple URLs
-        results = self.client.search(
-            self.start_url, match_type="exact", from_date=current_date
-        )
+        date_cursor = self.start_date
+        while date_cursor < self.end_date:
+            # each search result will contain multiple URLs
+            results = self.client.search(
+                self.start_url,
+                match_type="exact",
+                from_date=date_cursor,
+            )
+            log.info(
+                "wayback search",
+                url=self.start_url,
+                from_date=date_cursor,
+            )
 
-        while current_date < self.end_date:
-            # get a new record and yield the URL
-            try:
-                record = next(results)
-            except StopIteration:
-                break
+            for record in results:
+                # if this is too close to the last one, skip it
+                if record.timestamp - date_cursor < datetime.timedelta(
+                    hours=self.delta_hrs
+                ):
+                    continue
+                yield ArticleURL(url=record.view_url, source=self.source_name)
+                date_cursor = record.timestamp
 
-            next_time = record.timestamp
-
-            # if the next result is too close, skip it
-            if next_time - current_date < datetime.timedelta(hours=self.delta_hrs):
-                current_date += datetime.timedelta(hours=self.delta_hrs)
-                results = self.client.search(
-                    self.start_url, match_type="exact", from_date=current_date
-                )
-                continue
-
-            # yield back the article URL and update the date cursor
-            yield ArticleURL(url=record.view_url, source=self.source_name)
-            current_date = next_time
+                if date_cursor > self.end_date:
+                    break
 
     def get_article_urls(
         self, response: HttpResponse

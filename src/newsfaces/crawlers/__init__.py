@@ -8,6 +8,7 @@ from .hill import TheHill
 from .nbc import NBC
 from .newsmax import NewsmaxCrawler
 from .npr import NprCrawler
+from .nyt import NYTCrawler
 from .politico import Politico
 from .wapo import WashingtonPost, WashingtonPost_API
 from .washington_times import WashingtonTimes
@@ -25,6 +26,7 @@ __all__ = [
     "NBC",
     "NewsmaxCrawler",
     "NprCrawler",
+    "NYTCrawler",
     "Politico",
     "WashingtonPost",
     "WashingtonPost_API",
