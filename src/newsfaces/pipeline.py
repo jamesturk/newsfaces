@@ -1,6 +1,5 @@
 import itertools
 from databeakers.pipeline import Pipeline
-from databeakers.beakers import TempBeaker
 from databeakers.http import HttpResponse, HttpRequest
 from databeakers.transforms import RateLimit, Conditional
 from databeakers._record import Record

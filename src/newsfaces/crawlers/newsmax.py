@@ -124,7 +124,6 @@ class NewsmaxExtractor(Extractor):
         # Obtain img info and captions which in the Daily both live inside the
         # same parent element (img_container)
         for container in img_container:
-
             # Inside the image container when grabbing the caption there are two elements
             # The first has empty text while the second one contains the caption
             caption = container.cssselect("div.artCaptionContainer")[1].text
