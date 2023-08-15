@@ -1,0 +1,3 @@
+[databeakers]
+pipeline_path = "newsfaces.pipeline.pipeline"
+log_level = "warning"
