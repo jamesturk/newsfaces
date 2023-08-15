@@ -111,10 +111,12 @@ class NPRExtractor(Extractor):
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_p_selector(list): list of css selector for the parent elements 
+            of images in articles
             - img_selector(list): css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as an image object
+            -imgs(lst): list where each element is an image represented as 
+            an image object
         """
         imgs = []
         img_items = []
@@ -141,13 +143,25 @@ class NPRExtractor(Extractor):
             captions.append(caption)
 
         # Create image items joining each caption with their respective image
-        for i in range(len(img_items)):
-            image = Image(
-                url=img_items[i]["src"] or "",
-                image_type=ImageType("main"),
-                alt_text=img_items[i]["alt"] or "",
-                caption=captions[i],
-            )
-            imgs.append(image)
+        #in case the length of captions and img_items match
+
+        if len(img_items) == len(caption_items):
+            for i in range(len(img_items)):
+                image = Image(
+                    url=img_items[i]["src"] or "",
+                    image_type=ImageType("main"),
+                    alt_text=img_items[i]["alt"] or "",
+                    caption=captions[i] or "",
+                )
+                imgs.append(image)
+        else:
+            for img in img_items:
+                image = Image(
+                    url = img["src"] or "",
+                    image_type=ImageType("main"),
+                    alt_text=img["alt"] or "",
+                    caption=""
+                )
+                imgs.append(image)
 
         return imgs
