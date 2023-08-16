@@ -1,12 +1,14 @@
 from ..crawler import Crawler
 import re
 import datetime
+from newsfaces.models import URL
 
 
 class NprCrawler(Crawler):
     def __init__(self):
         super().__init__()
         self.url = "https://www.npr.org/sections/politics/archive?"
+        self.source = "npr"
 
     def obtain_page_urls(self, start="0", date="12-31-2023"):
         """
@@ -32,7 +34,7 @@ class NprCrawler(Crawler):
 
         url_set = set(links_list)
 
-        return url_set, int(month)
+        return [URL(url=url, source=self.source) for url in url_set], int(month)
 
     def obtain_monthly_urls(self, start=0, month=12, year=2023):
         """
@@ -62,18 +64,15 @@ class NprCrawler(Crawler):
         }
 
         date = "{}-{}-{}".format(month, last_day_month[month], year)
-        month_urls = set()
         page = 1
         print("Obtaining links for ", month, "-", year, ",page:", page)
         current_month = month
         while current_month == month:
             page_urls, current_month = self.obtain_page_urls(start, date)
-            month_urls.update(page_urls)
+            yield from page_urls
             start += 15
             page += 1
             print("Obtaining links for ", month, "-", year, ",page:", page)
-
-        return month_urls
 
     def crawl(self, start_time=datetime.date(2020, 1, 1)):
         """
@@ -84,9 +83,6 @@ class NprCrawler(Crawler):
         - npr_url(set): Set of all the NPR politics section url until the specified year
         """
         min_year = start_time.year
-        articles_set = set()
         for year in range(min_year, 2024):
             for month in range(1, 13):
-                articles_set.update(self.obtain_monthly_urls(0, month, year))
-
-        return articles_set
+                yield from self.obtain_monthly_urls(0, month, year)
