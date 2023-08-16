@@ -1,18 +1,17 @@
 from newsfaces.extract_html import Extractor
 from newsfaces.utils import make_link_absolute, page_grab
 from newsfaces.crawler import Crawler
-from newsfaces.models import Image, Article, ImageType
+from newsfaces.models import Image, Article, ImageType, URL
 
 
 class Politico(Crawler):
     def __init__(self):
         super().__init__()
+        self.source = "politico"
 
     def crawl(self):
-        """
-        Implement crawl here to override behavior
-        """
-        return self.politico_get_urls()
+        for page in range(1, 3400):
+            yield from self.get_urls(f"https://www.politico.com/politics/{page}")
 
     def get_urls(self, url):
         """
@@ -26,23 +25,16 @@ class Politico(Crawler):
             A list of article URLs on that page.
         """
         response = self.make_request(url)
-        urls = []
         container = response.cssselect("div.summary")
 
         for j in container:
             atr = j.cssselect("a")
             if atr and len(atr) > 0:
                 href = atr[0].get("href")
-                urls.append(make_link_absolute(href, "https://www.politico.com"))
-        return urls
-
-    def politico_get_urls(self):
-        urls = set()
-        for page in range(1, 3400):
-            urls = urls.union(
-                self.get_urls(f"https://www.politico.com/politics/{page}")
-            )
-        return urls
+                yield URL(
+                    url=make_link_absolute(href, "https://www.politico.com"),
+                    source=self.source,
+                )
 
 
 class Politico_Extractor(Extractor):
