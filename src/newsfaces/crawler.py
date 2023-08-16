@@ -110,8 +110,11 @@ class WaybackCrawler(Crawler):
         """
 
         date_cursor = self.start_date
+        # this is designed to loop through all results while never yielding back
+        # two results that are too close together
         while date_cursor < self.end_date:
-            # each search result will contain multiple URLs
+            # this creates an iterator (results) that provides all results
+            # starting at from_date
             results = self.client.search(
                 self.start_url,
                 match_type="exact",
@@ -123,15 +126,24 @@ class WaybackCrawler(Crawler):
                 from_date=date_cursor,
             )
 
+            # using that iterator, loop through all results, until...
             for record in results:
-                # if this is too close to the last one, skip it
-                if record.timestamp - date_cursor < datetime.timedelta(
+                # yield if this record is far enough away from the previous one
+                if record.timestamp - date_cursor >= datetime.timedelta(
                     hours=self.delta_hrs
                 ):
-                    continue
-                yield URL(url=record.view_url, source=self.source_name)
-                date_cursor = record.timestamp
+                    log.info(
+                        "archive record",
+                        time=record.timestamp,
+                        skip=False,
+                        time_between=record.timestamp - date_cursor,
+                    )
+                    yield URL(url=record.view_url, source=self.source_name)
+                    date_cursor = record.timestamp
+                else:
+                    log.info("archive record", time=record.timestamp, skip=True)
 
+                # if outer loop has reached the end, break out of inner loop
                 if date_cursor > self.end_date:
                     break
 
