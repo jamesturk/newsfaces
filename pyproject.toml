@@ -16,7 +16,8 @@ typer = "^0.9.0"
 jupyter = "^1.0.0"
 wayback = "^0.4.2"
 pytz = "^2023.3"
-databeakers = {path = "../beakers", develop = true}
+databeakers = "^0.2.2"
+#databeakers = {path = "../beakers", develop = true}
 
 
 [tool.poetry.group.dev.dependencies]
