@@ -104,7 +104,7 @@ class WaybackCrawler(Crawler):
         self.end_date = end_date
         self.delta_hrs = delta_hrs
 
-    def get_wayback_urls(self) -> Generator[URL]:  # ArchiveURL
+    def get_wayback_urls(self) -> Generator[URL, None, None]:
         """
         Yield all wayback URLs between start_date and end_date
         """
