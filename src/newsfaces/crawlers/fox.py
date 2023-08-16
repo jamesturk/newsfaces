@@ -1,4 +1,3 @@
-from newsfaces.utils import make_link_absolute
 from ..models import URL
 from ..extract_html import Extractor
 from ..utils import make_link_absolute
