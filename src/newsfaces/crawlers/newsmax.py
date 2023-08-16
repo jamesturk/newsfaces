@@ -1,7 +1,7 @@
 from ..crawler import Crawler
 from ..extract_html import Extractor
 from ..models import Image, ImageType, URL
-from newsfaces.utils import make_link_absolute
+from ..utils import page_grab, make_link_absolute
 import datetime
 
 CURRENT_YEAR = datetime.datetime.now().year
@@ -16,7 +16,8 @@ class NewsmaxCrawler(Crawler):
 
     def obtain_page_urls(self, year="2016", month="1"):
         """
-        Obtain the urls for a given year and month from the politics section of Newsmax
+        Obtain the urls for a given year and month from the politics
+        section of Newsmax
         Inputs:
         -year(str): Year of the articles to search for
         -month(str): Month of the articles to search for
@@ -36,7 +37,8 @@ class NewsmaxCrawler(Crawler):
         Obtain all newsmax urls from the politics section
         Inputs: None
         Return:
-        newsmax_links (dict): Dictionary where the keys are str for date (year-mth)
+        newsmax_links (dict): Dictionary where the keys are str for
+          date (year-mth)
         and values are lists with the urls of that given key
         """
         for year in range(self.min_year, CURRENT_YEAR + 1):
@@ -64,10 +66,12 @@ class NewsmaxExtractor(Extractor):
             - article_selector(str): css selector for article container
             - head_img_div(list)- css selector for parent div of headline image
             - head_img_select(list)- css selector for images
-            - img_p_selector(list): css selector for the parent elements of images in article
+            - img_p_selector(list): css selector for the parent elements of
+            images in article
             - img_selector(list): css selector for images living inside the article
             container
-            - p_selector(list): css selector for paragraphs living inside the article container
+            - p_selector(list): css selector for paragraphs living inside the
+              article container
             - t_selector(list): css selector for title living inside the container
         Return:
             -imgs(lst): list where each element is an instance of a Image Class
@@ -105,10 +109,12 @@ class NewsmaxExtractor(Extractor):
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_p_selector(list): list of css selector for the parent elements
+            of images in articles
             - img_selector(list): css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as an image object
+            -imgs(lst): list where each element is an image represented as
+            an image object
         """
         imgs = []
 
