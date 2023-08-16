@@ -1,6 +1,10 @@
-from .crawler import Crawler
 import re
 import datetime
+from .crawler import Crawler
+from ..extract_html import Extractor
+from ..models import Image, ImageType
+
+CURRENT_YEAR = datetime.datetime.now().year
 
 
 class NprCrawler(Crawler):
@@ -75,7 +79,8 @@ class NprCrawler(Crawler):
 
         return month_urls
 
-    def crawl(self, start_time=datetime.date(2020, 1, 1)):
+    def crawl(self, start_time=datetime.date(2015, 1, 1)):
+
         """
         Crawl the NPR politics section
         Inputs:
@@ -85,8 +90,79 @@ class NprCrawler(Crawler):
         """
         min_year = start_time.year
         articles_set = set()
-        for year in range(min_year, 2024):
+        for year in range(min_year, CURRENT_YEAR + 1):
             for month in range(1, 13):
                 articles_set.update(self.obtain_monthly_urls(0, month, year))
 
         return articles_set
+
+
+class NPRExtractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["article.story"]
+        self.img_p_selector = ["div.imagewrap"]
+        self.img_selector = ["img"]
+        self.p_selector = ["p"]
+        self.t_selector = ["h1"]
+        self.head_img_select = []
+
+    def extract_imgs(self, html, img_p_selector, img_selector):
+        """
+        Extract the image content from an HTML:
+        Inputs:
+            - html(str): html to extract images from
+            - img_p_selector(list): list of css selector for the parent elements 
+            of images in articles
+            - img_selector(list): css selector for the image elements
+            Return:
+            -imgs(lst): list where each element is an image represented as 
+            an image object
+        """
+        imgs = []
+        img_items = []
+        captions = []
+
+        # Add images src and alt text
+        for selector in img_p_selector:
+            img_container = html.cssselect(selector)
+            for container in img_container:
+                for j in img_selector:
+                    photos = container.cssselect(j)
+                    for i in photos:
+                        # Most NPR images don't have alt text so to avoid
+                        # problems when iterating and indexing the list, we add it in a
+                        "dictionary"
+                        img_item = {"src": i.get("src"), "alt": i.get("alt")}
+
+                    img_items.append(img_item)
+
+        # Create captions list that live in other elements
+        caption_items = html.cssselect("div.caption")
+        for item in caption_items:
+            caption = item.cssselect("p")[0].text
+            captions.append(caption)
+
+        # Create image items joining each caption with their respective image
+        #in case the length of captions and img_items match
+
+        if len(img_items) == len(caption_items):
+            for i in range(len(img_items)):
+                image = Image(
+                    url=img_items[i]["src"] or "",
+                    image_type=ImageType("main"),
+                    alt_text=img_items[i]["alt"] or "",
+                    caption=captions[i] or "",
+                )
+                imgs.append(image)
+        else:
+            for img in img_items:
+                image = Image(
+                    url = img["src"] or "",
+                    image_type=ImageType("main"),
+                    alt_text=img["alt"] or "",
+                    caption=""
+                )
+                imgs.append(image)
+
+        return imgs
