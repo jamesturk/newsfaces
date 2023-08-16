@@ -5,7 +5,6 @@ from databeakers.transforms import RateLimit, Conditional
 import httpx
 from .models import URL, Article
 from .pipeline_helpers import (
-    article_seed_wrapper,
     make_comparator,
     make_extractor,
 )
@@ -146,9 +145,7 @@ crawler.crawl directly, since it returns a iterable of URLs.
 for source, classes in SOURCE_MAPPING.items():
     (crawler, extractor) = classes
     pipeline.add_beaker(f"{source}_url", URL)
-    pipeline.add_seed(
-        source, f"{source}_url", article_seed_wrapper(crawler.crawl, source)
-    )
+    pipeline.add_seed(source, f"{source}_url", crawler.crawl)
 
 """
 We continue defining the pipeline, from this point forward it is the same for both.
@@ -161,6 +158,7 @@ for source, classes in itertools.chain(
     WAYBACK_SOURCE_MAPPING.items(), SOURCE_MAPPING.items()
 ):
     (crawler, extractor) = classes
+    pipeline.add_beaker("article", Article)
     pipeline.add_transform(
         f"{source}_url",
         f"{source}_response",

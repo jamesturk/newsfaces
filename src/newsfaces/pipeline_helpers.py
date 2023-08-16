@@ -12,20 +12,6 @@ understand them to work with the pipeline.)
 """
 
 
-def article_seed_wrapper(crawl_func, source):
-    """
-    Convert a function that returns a list of article URLs (strings)
-    into a function that returns an iterable that contains URL
-    objects tagged with the source.
-    """
-
-    def new_func():
-        for url in crawl_func():
-            yield URL(url=url, source=source)
-
-    return new_func
-
-
 def make_comparator(source: str):
     """
     Build a comparator function to filter on source.
