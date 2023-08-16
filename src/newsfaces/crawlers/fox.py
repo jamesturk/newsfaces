@@ -1,6 +1,8 @@
 from newsfaces.utils import make_link_absolute
-from newsfaces.models import URL
-from ..crawler import Crawler, WaybackCrawler
+from ..models import URL
+from ..extract_html import Extractor
+from ..utils import make_link_absolute
+from .crawler import Crawler, WaybackCrawler
 import json
 
 
@@ -51,3 +53,15 @@ class Fox_API(Crawler):
                 yield URL(url=url, source=self.source)
             else:
                 pass  # TODO: video
+
+
+class Fox_Extractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["div.article-content-wrap.sticky-columns"]
+        self.img_p_selector = ["div.m"]
+        self.img_selector = ["img"]
+        self.head_img_div = None
+        self.head_img_select = None
+        self.p_selector = ["p"]
+        self.t_selector = ["h1", "h6"]
