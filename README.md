@@ -69,3 +69,9 @@ Here's a quick guide to what code is run at each step:
 **`source_response` -> `article`** - `Extractor.scrape(HttpResponse) -> Article`
 
 So, for example, if you are running `bkr run --only archive_response`, you are running the `get_article_urls` method of the `ArchiveCrawler` class. The input is an already-fetched `HttpResponse` object, and the output is a `Generator` of `ArticleURL` objects.
+
+## Images
+
+![](./images/graph.png)
+
+![](./images/graph-complete.png)
