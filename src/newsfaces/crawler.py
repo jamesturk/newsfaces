@@ -7,7 +7,7 @@ from typing import Generator
 from wayback import WaybackClient, memento_url_data, WaybackSession
 from structlog import get_logger
 from .utils import make_link_absolute
-from .models import ArticleURL
+from .models import URL
 from databeakers.http import HttpResponse
 
 DEFAULT_DELAY = 0.5
@@ -52,9 +52,7 @@ class Crawler:
         """
         return self.get_urls(self.start_url, self.selector)
 
-    def get_article_urls(
-        self, response: HttpResponse
-    ) -> Generator[ArticleURL, None, None]:
+    def get_article_urls(self, response: HttpResponse) -> Generator[URL, None, None]:
         """
         This function takes a response & a list of css selectors and returns
         a list of URLs.
@@ -106,7 +104,7 @@ class WaybackCrawler(Crawler):
         self.end_date = end_date
         self.delta_hrs = delta_hrs
 
-    def get_wayback_urls(self) -> Generator[ArchiveURL]:
+    def get_wayback_urls(self) -> Generator[URL]:  # ArchiveURL
         """
         Yield all wayback URLs between start_date and end_date
         """
@@ -131,15 +129,13 @@ class WaybackCrawler(Crawler):
                     hours=self.delta_hrs
                 ):
                     continue
-                yield ArticleURL(url=record.view_url, source=self.source_name)
+                yield URL(url=record.view_url, source=self.source_name)
                 date_cursor = record.timestamp
 
                 if date_cursor > self.end_date:
                     break
 
-    def get_article_urls(
-        self, response: HttpResponse
-    ) -> Generator[ArticleURL, None, None]:
+    def get_article_urls(self, response: HttpResponse) -> Generator[URL, None, None]:
         """
         Get all article URLs from a wayback URL
         """
@@ -147,6 +143,6 @@ class WaybackCrawler(Crawler):
         # convert to normal URLs
         for item in articles:
             if "/web/" in item or "web.archive.org" in item:
-                yield ArticleURL(url=memento_url_data(item)[0], source=self.source_name)
+                yield URL(url=memento_url_data(item)[0], source=self.source_name)
             else:
-                yield ArticleURL(url=item, source=self.source_name)
+                yield URL(url=item, source=self.source_name)
