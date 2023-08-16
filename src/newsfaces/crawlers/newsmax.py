@@ -1,7 +1,7 @@
-from .crawler import Crawler
+from ..crawler import Crawler
 from ..extract_html import Extractor
-from ..models import Image, ImageType
-from ..utils import page_grab
+from ..models import Image, ImageType, URL
+from ..utils import page_grab, make_link_absolute
 import datetime
 
 CURRENT_YEAR = datetime.datetime.now().year
@@ -12,6 +12,7 @@ class NewsmaxCrawler(Crawler):
         super().__init__()
         self.url = "https://www.newsmax.com/archives/politics/1/"
         self.min_year = min_year
+        self.source = "newsmax"
 
     def obtain_page_urls(self, year="2016", month="1"):
         """
@@ -26,13 +27,10 @@ class NewsmaxCrawler(Crawler):
         url = self.url + "{}/{}/".format(year, month)
         root = self.make_request(url)
         links_elements = root.cssselect("h5.archiveH5")
-        links_list = []
         for element in links_elements:
             link = element.cssselect("a")
-            href = link[0].get("href")
-            full_link = "newsmax.com" + href
-            links_list.append(full_link)
-        return links_list
+            href = make_link_absolute("https://newsmax.com", link[0].get("href"))
+            yield URL(url=href, source=self.source)
 
     def crawl(self):
         """
@@ -43,17 +41,11 @@ class NewsmaxCrawler(Crawler):
           date (year-mth)
         and values are lists with the urls of that given key
         """
-
-        articles_set = set()
-
-        # Obtain news for
-        for year in range(2015, CURRENT_YEAR + 1):
+        for year in range(self.min_year, CURRENT_YEAR + 1):
             for month in range(1, 13):
                 date = str(year) + "-" + str(month)
                 print("Obtaining news from:", date)
-                articles_set.update(self.obtain_page_urls(str(year), str(month)))
-
-        return articles_set
+                yield from self.obtain_page_urls(str(year), str(month))
 
 
 class NewsmaxExtractor(Extractor):
@@ -131,7 +123,7 @@ class NewsmaxExtractor(Extractor):
         # Obtain img info and captions which in the Daily both live inside the
         # same parent element (img_container)
         for container in img_container:
-            # Inside the image container when grabbing there are two caption elements
+            # Inside the image container when grabbing the caption there are two elements
             # The first has empty text while the second one contains the caption
             caption = container.cssselect("div.artCaptionContainer")[1].text
             for j in img_selector:
