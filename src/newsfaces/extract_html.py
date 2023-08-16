@@ -1,5 +1,5 @@
-from newsfaces.utils import page_grab
-from newsfaces.models import Article, Image, ImageType
+from .utils import page_grab
+from .models import Article, Image, ImageType
 
 
 class Extractor(object):

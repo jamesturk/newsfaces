@@ -36,8 +36,7 @@ class AP(WaybackCrawler):
             if len(container) > 0:
                 urls += self.parse_links(container)
         xpath_sel = ["TwoColumnContainer", "CardHeadline"]
-        # for items that have random characters continually added at
-        # the end so we do non-exact matching
+        # for items that have random characters continually added at the end so we do non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@class, '{j}')]")
             if len(container) > 0:
@@ -71,3 +70,6 @@ class AP(WaybackCrawler):
                         href = make_link_absolute(href, "https://web.archive.org")
                     urls.append(href)
         return urls
+    
+        
+
