@@ -63,4 +63,4 @@ class Fox_Extractor(Extractor):
         self.head_img_div = None
         self.head_img_select = None
         self.p_selector = ["p"]
-        self.t_selector = ["h1", "h6"]
+        self.t_selector = ["h1"]
