@@ -3,7 +3,7 @@ from ..crawler import WaybackCrawler
 import lxml.html
 
 
-class AP(WaybackCrawler):
+class APArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("ap")
         self.start_url = ""

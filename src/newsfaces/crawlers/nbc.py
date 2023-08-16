@@ -5,23 +5,18 @@ import re
 url = "https://www.nbcnews.com/politics/"
 
 
-class NBC(WaybackCrawler):
+class NBCArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("nbc")
         self.start_url = "https://www.nbcnews.com/politics/"
         self.selector = []
 
-    def get_article_urls(self, archive_url):
+    def get_article_urls(self, response):
         """
         Implement get_archive_urls here to override behavior
         """
-        return self.get_nbc(url, self.session)
-
-    def get_nbc(self, url, session=None):
-        response = self.http_get(url, session=None)
-
         # Retrieve the raw HTML content
-        html = response.text
+        html = response.response_body
         # Define the pattern and delimiter
         pattern = f'href="{url}'
 

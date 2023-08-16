@@ -9,22 +9,22 @@ from .pipeline_helpers import (
     make_extractor,
 )
 from .crawlers import (
-    BBC,
+    BBCArchive,
     BBC_Latest,
-    BreitbartCrawler,
-    CnnCrawler,
+    BreitbartArchive,
+    CnnArchive,
     DailyCrawler,
-    Fox,
+    FoxArchive,
     Fox_API,
-    TheHill,
-    NBC,
+    TheHillArchive,
+    NBCArchive,
     NewsmaxCrawler,
     NprCrawler,
     NYTCrawler,
     Politico,
-    WashingtonPost,
+    WashingtonPostArchive,
     WashingtonPost_API,
-    WashingtonTimes,
+    WashingtonTimesArchive,
 )
 
 """
@@ -51,14 +51,14 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
 """
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
-    "bbc_archive": (BBC(), None),
-    "breitbart": (BreitbartCrawler(), None),
-    "cnn": (CnnCrawler(), None),
-    "fox": (Fox(), None),
-    "hill": (TheHill(), None),
-    "nbc": (NBC(), None),
-    "wapo": (WashingtonPost(), None),
-    "washtimes": (WashingtonTimes(), None),
+    "bbc_archive": (BBCArchive(), None),
+    "breitbart": (BreitbartArchive(), None),
+    "cnn": (CnnArchive(), None),
+    "fox": (FoxArchive(), None),
+    "hill": (TheHillArchive(), None),
+    "nbc": (NBCArchive(), None),
+    "wapo": (WashingtonPostArchive(), None),
+    "washtimes": (WashingtonTimesArchive(), None),
 }
 
 SOURCE_MAPPING = {

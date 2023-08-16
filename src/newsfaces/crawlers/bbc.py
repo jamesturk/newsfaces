@@ -54,14 +54,15 @@ class BBC_Latest(Crawler):
                 pass  # TODO: video
 
 
-class BBC(WaybackCrawler):
+class BBCArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("bbc")
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t"
         self.selector = ["div.archive__item__content", "h2.node__title.node-title"]
+        self.source = "bbc_archive"
 
     def get_article_urls(self, response):
-        doc = lxml.html.fromstring(response.text)
+        doc = lxml.html.fromstring(response.response_body)
         xpath_sel = ["article", "video"]
         articles = set()
         videos = set()
@@ -75,6 +76,7 @@ class BBC(WaybackCrawler):
                     href = a[0].get("href")
                     href = make_link_absolute(href, "https://web.archive.org")
                     if j == "article":
+                        yield URL(url=href, source=self.source)
                         articles.add(href)
                     else:
                         videos.add(href)

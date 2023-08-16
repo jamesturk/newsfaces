@@ -4,7 +4,7 @@ from ..crawler import Crawler, WaybackCrawler
 import json
 
 
-class Fox(WaybackCrawler):
+class FoxArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("fox")
         self.start_url = "https://www.foxnews.com/politics"
@@ -14,7 +14,10 @@ class Fox(WaybackCrawler):
 class Fox_API(Crawler):
     def __init__(self):
         super().__init__()
-        self.start_url = "https://www.foxnews.com/api/article-search?searchBy=categories&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
+        self.start_url = (
+            "https://www.foxnews.com/api/article-search?searchBy=categories"
+            "&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
+        )
         self.source = "fox_api"
 
     def crawl(self):

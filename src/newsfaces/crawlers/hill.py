@@ -1,7 +1,7 @@
 from ..crawler import WaybackCrawler
 
 
-class TheHill(WaybackCrawler):
+class TheHillArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("hill")
         self.start_url = "https://thehill.com/policy/"

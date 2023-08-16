@@ -1,7 +1,7 @@
 from ..crawler import WaybackCrawler
 
 
-class CnnCrawler(WaybackCrawler):
+class CnnArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("cnn")
         self.start_url = "https://www.cnn.com/politics/"

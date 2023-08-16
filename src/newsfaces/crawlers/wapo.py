@@ -7,7 +7,11 @@ from newsfaces.models import URL
 class WashingtonPost_API(Crawler):
     def __init__(self):
         super().__init__()
-        self.start_url = "https://www.washingtonpost.com/prism/api/prism-query?_website=washpost&query=%7B%22query%22%3A%22prism%3A%2F%2Fprism.query%2Fsite-articles-only%2C%2Fpolitics%26offset%3D600%26limit%3D30%22%7D"
+        self.start_url = (
+            "https://www.washingtonpost.com/prism/api/prism-query?_website=washpost"
+            "&query=%7B%22query%22%3A%22prism%3A%2F%2Fprism.query%2Fsite-articles-only"
+            "%2C%2Fpolitics%26offset%3D600%26limit%3D30%22%7D"
+        )
         self.source = "wapo_api"
 
     def crawl(self):
@@ -50,7 +54,7 @@ class WashingtonPost_API(Crawler):
                 pass  # TODO: video
 
 
-class WashingtonPost(WaybackCrawler):
+class WashingtonPostArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("wapo")
         self.start_url = "https://www.washingtonpost.com/politics/"
