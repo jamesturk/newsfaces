@@ -1,7 +1,5 @@
 from newsfaces.utils import make_link_absolute
 from ..crawler import WaybackCrawler
-import datetime
-import pytz
 import lxml.html
 
 

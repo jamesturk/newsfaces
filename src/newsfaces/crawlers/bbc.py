@@ -1,4 +1,5 @@
 from ..crawler import Crawler, WaybackCrawler
+import lxml.html
 from newsfaces.utils import make_link_absolute
 from newsfaces.models import URL
 

@@ -1,4 +1,3 @@
-
 import re
 import datetime
 from .crawler import Crawler
@@ -92,7 +91,6 @@ class NprCrawler(Crawler):
                 yield from self.obtain_monthly_urls(0, month, year)
 
 
-
 class NPRExtractor(Extractor):
     def __init__(self):
         super().__init__()
@@ -108,11 +106,11 @@ class NPRExtractor(Extractor):
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements 
+            - img_p_selector(list): list of css selector for the parent elements
             of images in articles
             - img_selector(list): css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as 
+            -imgs(lst): list where each element is an image represented as
             an image object
         """
         imgs = []
@@ -140,7 +138,7 @@ class NPRExtractor(Extractor):
             captions.append(caption)
 
         # Create image items joining each caption with their respective image
-        #in case the length of captions and img_items match
+        # in case the length of captions and img_items match
 
         if len(img_items) == len(caption_items):
             for i in range(len(img_items)):
@@ -154,10 +152,10 @@ class NPRExtractor(Extractor):
         else:
             for img in img_items:
                 image = Image(
-                    url = img["src"] or "",
+                    url=img["src"] or "",
                     image_type=ImageType("main"),
                     alt_text=img["alt"] or "",
-                    caption=""
+                    caption="",
                 )
                 imgs.append(image)
 

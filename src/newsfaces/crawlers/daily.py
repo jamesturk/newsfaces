@@ -57,7 +57,6 @@ class DailyCrawler(Crawler):
                 page += 1
 
 
-
 class DailyExtractor(Extractor):
     def __init__(self):
         super().__init__()

@@ -1,5 +1,4 @@
-from ..crawler import WaybackCrawler, WaybackClient, WaybackSession
-from newsfaces.utils import make_link_absolute
+from ..crawler import WaybackCrawler
 
 
 class BreitbartCrawler(WaybackCrawler):

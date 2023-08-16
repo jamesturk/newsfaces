@@ -9,7 +9,6 @@ from .pipeline_helpers import (
     make_extractor,
 )
 from .crawlers import (
-    AP,
     BBC,
     BBC_Latest,
     BreitbartCrawler,
@@ -42,12 +41,13 @@ pipeline = Pipeline("newsfaces", "newsfaces.db")
 
 
 """
-Next we just create a convinience mapping between short names & their respective classes.
+Next we just create a convenience mapping between short names & their respective classes.
 
-An alternative to this would be to have the classes be named very rigidly (e.g. ap.Crawler, ap.Extractor) 
-so they could be derived automatically.  
+An alternative to this would be to have the classes be named very rigidly (e.g. ap.Crawler,
+ ap.Extractor) so they could be derived automatically.  
 
-**Note:** To enable extraction, change the second member of the tuple to the appropriate extractor class.
+**Note:** To enable extraction, change the second member of the tuple to the appropriate
+ extractor class.
 """
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
@@ -127,7 +127,7 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
     """
     pipeline.add_beaker(f"{source}_url", URL)
     pipeline.add_transform(
-        f"archive_response",
+        "archive_response",
         f"{source}_url",
         Conditional(
             make_extractor("archive_response", crawler.get_article_urls),
@@ -150,7 +150,8 @@ for source, classes in SOURCE_MAPPING.items():
 """
 We continue defining the pipeline, from this point forward it is the same for both.
 
-{source_url} becomes {source_response} through HttpRequest again, aggregating errors/timeouts into the same beakers.
+{source_url} becomes {source_response} through HttpRequest again, aggregating 
+errors/timeouts into the same beakers.
 
 {source_response} then needs to become {article}, which is done by the extractor.
 """
@@ -169,4 +170,4 @@ for source, classes in itertools.chain(
         },
     )
     if extractor:
-        pipeline.add_transform(f"{source}_response", f"article", extractor)
+        pipeline.add_transform(f"{source}_response", "article", extractor)
