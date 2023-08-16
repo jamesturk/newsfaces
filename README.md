@@ -72,6 +72,8 @@ So, for example, if you are running `bkr run --only archive_response`, you are r
 
 ## Images
 
+Simplified graph of the pipeline:
 ![](./images/graph.png)
 
+Graph with all error handling included:
 ![](./images/graph-complete.png)
