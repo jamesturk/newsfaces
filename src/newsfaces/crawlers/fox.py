@@ -1,6 +1,5 @@
-# Util Functions
 from ..extract_html import Extractor
-from ..utils import make_link_absolute, page_grab
+from ..utils import make_link_absolute
 from .crawler import Crawler, WaybackCrawler
 import json
 
@@ -18,9 +17,9 @@ class Fox_API(Crawler):
         self.start_url = "https://www.foxnews.com/api/article-search?searchBy=categories&values=fox-news%2Fpolitics&size=30&from=15&mediaTags=primary_politics"
 
     def crawl(self):
-        '''
+        """
         run get_html with correct initial html from init
-        '''
+        """
         return self.get_newslinks(self.start_url)
 
     def get_newslinks(self, base_page, article=set(), video=set()):
@@ -61,13 +60,7 @@ class Fox_Extractor(Extractor):
         self.article_body = ["div.article-content-wrap.sticky-columns"]
         self.img_p_selector = ["div.m"]
         self.img_selector = ["img"]
-        self.head_img_div = ["div.contain"]
-        self.head_img_select = ["img"]
+        self.head_img_div = None
+        self.head_img_select = None
         self.p_selector = ["p"]
         self.t_selector = ["h1", "h6"]
-
-    def extract_head_img(self, html="", img_p_selector="", img_selector=""):
-        return []
-    
-a = Fox_Extractor()
-a.scrape()
