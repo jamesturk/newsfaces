@@ -1,7 +1,7 @@
 from .crawler import Crawler
 from ..extract_html import Extractor
 from ..models import Image, ImageType
-from ..utils import page_grab
+from ..utils import page_grab, make_link_absolute
 import datetime
 
 CURRENT_YEAR = datetime.datetime.now().year
@@ -30,7 +30,7 @@ class NewsmaxCrawler(Crawler):
         for element in links_elements:
             link = element.cssselect("a")
             href = link[0].get("href")
-            full_link = "newsmax.com" + href
+            full_link = make_link_absolute(href, "https://www.newsmax.com/")
             links_list.append(full_link)
         return links_list
 
@@ -99,7 +99,8 @@ class NewsmaxExtractor(Extractor):
                 break
 
         # Obtain images
-        imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
+        imgs += self.extract_imgs(article_body, self.img_p_selector,
+                                   self.img_selector)
         imgs += self.extract_social_media_image(html)
         imgs += self.extract_video_thumbnails(html)
 
@@ -131,8 +132,9 @@ class NewsmaxExtractor(Extractor):
         # Obtain img info and captions which in the Daily both live inside the
         # same parent element (img_container)
         for container in img_container:
-            # Inside the image container when grabbing there are two caption elements
-            # The first has empty text while the second one contains the caption
+            # Inside the image container when grabbing there are two caption
+            # elements. The first has empty text while the second 
+            # one contains the caption
             caption = container.cssselect("div.artCaptionContainer")[1].text
             for j in img_selector:
                 photos = container.cssselect(j)
