@@ -494,13 +494,13 @@ files = [
 
 [[package]]
 name = "databeakers"
-version = "0.2.2"
+version = "0.3.0"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "databeakers-0.2.2-py3-none-any.whl", hash = "sha256:8474eab1c025a92c4e361d33b4e1edb654cb57a79791aba03692b47e8359f034"},
-    {file = "databeakers-0.2.2.tar.gz", hash = "sha256:8da9edc62e99ac44bca365f94f072c8a8e5694ae804a2b86474e46c77dc4c80a"},
+    {file = "databeakers-0.3.0-py3-none-any.whl", hash = "sha256:c947180d9ac4c7bbd8dae60974c307f138464562706b8f8209b2336cc579647c"},
+    {file = "databeakers-0.3.0.tar.gz", hash = "sha256:8ad0259a653543dc884899622d6bd15736ff04395ab8cd9b9240c273525bdd43"},
 ]
 
 [package.dependencies]
@@ -2760,4 +2760,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "351f9f1586d937fdf7b80afd6d70359307f90b9ad0b9856c738b57e8557d26f0"
+content-hash = "8af4c1342b70bba4bce0307df26aa0d00709558afba725a1aaf21542cb27305d"
