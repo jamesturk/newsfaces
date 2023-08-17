@@ -58,7 +58,7 @@ class WashingtonPostArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("wapo")
         self.start_url = "https://www.washingtonpost.com/politics/"
-        self.selector = ["div.story-headline.pr-sm"]
+        self.selector = ["div.story-headline"]
 
     def get_article_urls(self, response):
         for url in super().get_article_urls(response):
