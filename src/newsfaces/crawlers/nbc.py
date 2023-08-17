@@ -1,9 +1,6 @@
 from ..crawler import WaybackCrawler
 from ..models import URL
-import re
-
-
-url = "https://www.nbcnews.com/politics/"
+import lxml.html
 
 
 class NBCArchive(WaybackCrawler):
@@ -11,24 +8,13 @@ class NBCArchive(WaybackCrawler):
         super().__init__("nbc")
         self.start_url = "https://www.nbcnews.com/politics"
         self.selector = []
-        self.source = "nbc"
+        self.link_patterns = ["nbcnews.com/politics"]
 
     def get_article_urls(self, response):
         # Retrieve the raw HTML content
         html = response.response_body
-        # Define the pattern and delimiter
-        pattern = f'href="{url}'
-
-        delimiter = '"'
-
-        # Find all matches of the pattern in the HTML content
-        matches = re.finditer(pattern, html)
-        # Process each match
-        for match in matches:
-            start_index = match.end()
-            end_index = html.find(delimiter, start_index)
-            if end_index != -1:
-                content = html[start_index:end_index]
-                if re.search(r".*/.*-.*-.*-", content):
-                    fullurl = url + content
-                    yield URL(url=fullurl, source=self.source)
+        doc = lxml.html.fromstring(html)
+        for link in doc.xpath("//a/@href"):
+            for link_pattern in self.link_patterns:
+                if link_pattern in link:
+                    yield URL(url=link, source=self.source_name)
