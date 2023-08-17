@@ -1,6 +1,7 @@
-# Util Functions
 from ..crawler import WaybackCrawler
+from ..models import URL
 import re
+
 
 url = "https://www.nbcnews.com/politics/"
 
@@ -8,13 +9,11 @@ url = "https://www.nbcnews.com/politics/"
 class NBCArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("nbc")
-        self.start_url = "https://www.nbcnews.com/politics/"
+        self.start_url = "https://www.nbcnews.com/politics"
         self.selector = []
+        self.source = "nbc"
 
     def get_article_urls(self, response):
-        """
-        Implement get_archive_urls here to override behavior
-        """
         # Retrieve the raw HTML content
         html = response.response_body
         # Define the pattern and delimiter
@@ -24,7 +23,6 @@ class NBCArchive(WaybackCrawler):
 
         # Find all matches of the pattern in the HTML content
         matches = re.finditer(pattern, html)
-        article = set()
         # Process each match
         for match in matches:
             start_index = match.end()
@@ -33,6 +31,4 @@ class NBCArchive(WaybackCrawler):
                 content = html[start_index:end_index]
                 if re.search(r".*/.*-.*-.*-", content):
                     fullurl = url + content
-                    article.add(fullurl)
-
-        return list(article)
+                    yield URL(url=fullurl, source=self.source)
