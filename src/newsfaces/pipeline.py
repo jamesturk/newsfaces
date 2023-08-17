@@ -122,6 +122,13 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
     splitter_map[source] = Transform(
         to_beaker=f"{source}_url",
         func=make_extractor("archive_response", crawler.get_article_urls),
+        name=f"{source}.get_article_urls",
+        allow_filter=True,
+        # TODO: right now some get_article_urls are returning empty lists
+        # you can see this by looking at the logs where you see something like
+        # transform (generator) with yield of 0 items
+        # if you set allow_filter=False, these will raise an exception instead
+        # of being ignored
     )
 
 pipeline.add_splitter(
