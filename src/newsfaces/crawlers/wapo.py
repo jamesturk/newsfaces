@@ -61,10 +61,6 @@ class WashingtonPostArchive(WaybackCrawler):
         self.selector = ["div.story-headline.pr-sm"]
 
     def get_article_urls(self, response):
-        articles = super().get_article_urls(response)
-        filtered_articles = [
-            article
-            for article in articles
-            if "https://www.washingtonpost.com/politics/2" in article
-        ]
-        return filtered_articles
+        for url in super().get_article_urls(response):
+            if "https://www.washingtonpost.com/politics/2" in url.url:
+                yield url
