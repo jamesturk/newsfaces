@@ -3,7 +3,6 @@ from ..crawler import WaybackCrawler
 from ..extract_html import Extractor
 
 
-
 class TheHillArchive(WaybackCrawler):
     def __init__(self):
         super().__init__("hill")
@@ -41,7 +40,7 @@ class Hill_Extractor(Extractor):
                 for j in img_selector:
                     photos = container.cssselect(j)
                     for photo in photos:
-                        caption= photo.xpath('ancestor::figure/figcaption')
+                        caption = photo.xpath("ancestor::figure/figcaption")
                         if caption:
                             cap_text = caption[0].text_content()
                         else:
@@ -49,7 +48,7 @@ class Hill_Extractor(Extractor):
                         img_item = Image(
                             url=photo.get("src") or "",
                             image_type=ImageType("main"),
-                            caption= cap_text, 
+                            caption=cap_text,
                             alt_text=photo.get("alt") or "",
                         )
                         imgs.append(img_item)

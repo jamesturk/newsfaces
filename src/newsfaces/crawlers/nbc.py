@@ -36,5 +36,3 @@ class NBCArchive(WaybackCrawler):
                     article.add(fullurl)
 
         return list(article)
-
-
