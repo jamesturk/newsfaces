@@ -144,11 +144,11 @@ class Extractor(object):
         )
         return [img_item]
 
-    def scrape(self, response_text):
+    def scrape(self, response):
         """
         Return article object from html string request
         """
-        html = lxml.html.fromstring(response_text)
+        html = lxml.html.fromstring(response.text)
         imgs, art_text, t_text = self.extract_html(html)
         article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
         return article
