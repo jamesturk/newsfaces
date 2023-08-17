@@ -100,7 +100,7 @@ class Extractor(object):
                         imgs.append(img_item)
                     break
 
-            return imgs
+        return imgs
 
     def extract_imgs(self, html, img_p_selector, img_selector):
         """
