@@ -82,6 +82,7 @@ class Extractor(object):
             -imgs(lst): list where each element is an image represented as a dictionary
             with src, alt, title, and caption as fields
         """
+        imgs = []
         for selector in img_p_selector:
             img_container = html.cssselect(selector)
             if len(img_container) == 0:
@@ -96,11 +97,10 @@ class Extractor(object):
                             caption=i.get("caption") or "",
                             alt_text=i.get("alt") or "",
                         )
+                        imgs.append(img_item)
                     break
-        try:
-            return [img_item]
-        except UnboundLocalError:
-            return []
+
+            return imgs
 
     def extract_imgs(self, html, img_p_selector, img_selector):
         """
@@ -144,11 +144,11 @@ class Extractor(object):
         )
         return [img_item]
 
-    def scrape(self, request_string):
+    def scrape(self, response_text):
         """
         Return article object from html string request
         """
-        html = lxml.html.fromstring(request_string)
+        html = lxml.html.fromstring(response_text)
         imgs, art_text, t_text = self.extract_html(html)
         article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
         return article
