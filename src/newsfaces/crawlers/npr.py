@@ -1,8 +1,8 @@
 import re
 import datetime
-from .crawler import Crawler
+from ..crawler import Crawler
 from ..extract_html import Extractor
-from ..models import Image, ImageType
+from ..models import Image, ImageType, URL
 
 CURRENT_YEAR = datetime.datetime.now().year
 
@@ -11,6 +11,7 @@ class NprCrawler(Crawler):
     def __init__(self):
         super().__init__()
         self.url = "https://www.npr.org/sections/politics/archive?"
+        self.source = "npr"
 
     def obtain_page_urls(self, start="0", date="12-31-2023"):
         """
@@ -36,7 +37,7 @@ class NprCrawler(Crawler):
 
         url_set = set(links_list)
 
-        return url_set, int(month)
+        return [URL(url=url, source=self.source) for url in url_set], int(month)
 
     def obtain_monthly_urls(self, start=0, month=12, year=2023):
         """
@@ -66,21 +67,17 @@ class NprCrawler(Crawler):
         }
 
         date = "{}-{}-{}".format(month, last_day_month[month], year)
-        month_urls = set()
         page = 1
         print("Obtaining links for ", month, "-", year, ",page:", page)
         current_month = month
         while current_month == month:
             page_urls, current_month = self.obtain_page_urls(start, date)
-            month_urls.update(page_urls)
+            yield from page_urls
             start += 15
             page += 1
             print("Obtaining links for ", month, "-", year, ",page:", page)
 
-        return month_urls
-
     def crawl(self, start_time=datetime.date(2015, 1, 1)):
-
         """
         Crawl the NPR politics section
         Inputs:
@@ -89,12 +86,9 @@ class NprCrawler(Crawler):
         - npr_url(set): Set of all the NPR politics section url until the specified year
         """
         min_year = start_time.year
-        articles_set = set()
-        for year in range(min_year, CURRENT_YEAR + 1):
+        for year in range(min_year, 2024):
             for month in range(1, 13):
-                articles_set.update(self.obtain_monthly_urls(0, month, year))
-
-        return articles_set
+                yield from self.obtain_monthly_urls(0, month, year)
 
 
 class NPRExtractor(Extractor):
@@ -112,11 +106,11 @@ class NPRExtractor(Extractor):
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements 
+            - img_p_selector(list): list of css selector for the parent elements
             of images in articles
             - img_selector(list): css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as 
+            -imgs(lst): list where each element is an image represented as
             an image object
         """
         imgs = []
@@ -144,7 +138,7 @@ class NPRExtractor(Extractor):
             captions.append(caption)
 
         # Create image items joining each caption with their respective image
-        #in case the length of captions and img_items match
+        # in case the length of captions and img_items match
 
         if len(img_items) == len(caption_items):
             for i in range(len(img_items)):
@@ -158,10 +152,10 @@ class NPRExtractor(Extractor):
         else:
             for img in img_items:
                 image = Image(
-                    url = img["src"] or "",
+                    url=img["src"] or "",
                     image_type=ImageType("main"),
                     alt_text=img["alt"] or "",
-                    caption=""
+                    caption="",
                 )
                 imgs.append(image)
 

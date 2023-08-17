@@ -1,4 +1,4 @@
-from .crawler import Crawler, START_DATE, END_DATE
+from ..crawler import Crawler, START_DATE, END_DATE
 from ..utils import make_link_absolute
 import json
 import requests
