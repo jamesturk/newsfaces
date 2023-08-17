@@ -1,6 +1,7 @@
-from .crawler import Crawler
+from ..crawler import Crawler
 from ..extract_html import Extractor
-from ..models import Image, ImageType
+from ..models import Image, ImageType, URL
+from ..utils import page_grab, make_link_absolute
 import datetime
 
 CURRENT_YEAR = datetime.datetime.now().year
@@ -11,10 +12,12 @@ class NewsmaxCrawler(Crawler):
         super().__init__()
         self.url = "https://www.newsmax.com/archives/politics/1/"
         self.min_year = min_year
+        self.source = "newsmax"
 
     def obtain_page_urls(self, year="2016", month="1"):
         """
-        Obtain the urls for a given year and month from the politics section of Newsmax
+        Obtain the urls for a given year and month from the politics
+        section of Newsmax
         Inputs:
         -year(str): Year of the articles to search for
         -month(str): Month of the articles to search for
@@ -24,33 +27,25 @@ class NewsmaxCrawler(Crawler):
         url = self.url + "{}/{}/".format(year, month)
         root = self.make_request(url)
         links_elements = root.cssselect("h5.archiveH5")
-        links_list = []
         for element in links_elements:
             link = element.cssselect("a")
-            href = link[0].get("href")
-            full_link = "newsmax.com" + href
-            links_list.append(full_link)
-        return links_list
+            href = make_link_absolute("https://newsmax.com", link[0].get("href"))
+            yield URL(url=href, source=self.source)
 
     def crawl(self):
         """
         Obtain all newsmax urls from the politics section
         Inputs: None
         Return:
-        newsmax_links (dict): Dictionary where the keys are str for date (year-mth)
+        newsmax_links (dict): Dictionary where the keys are str for
+          date (year-mth)
         and values are lists with the urls of that given key
         """
-
-        articles_set = set()
-
-        # Obtain news for
-        for year in range(min_year, CURRENT_YEAR + 1):
+        for year in range(self.min_year, CURRENT_YEAR + 1):
             for month in range(1, 13):
                 date = str(year) + "-" + str(month)
                 print("Obtaining news from:", date)
-                articles_set.update(self.obtain_page_urls(str(year), str(month)))
-
-        return articles_set
+                yield from self.obtain_page_urls(str(year), str(month))
 
 
 class NewsmaxExtractor(Extractor):
@@ -71,10 +66,12 @@ class NewsmaxExtractor(Extractor):
             - article_selector(str): css selector for article container
             - head_img_div(list)- css selector for parent div of headline image
             - head_img_select(list)- css selector for images
-            - img_p_selector(list): css selector for the parent elements of images in article
+            - img_p_selector(list): css selector for the parent elements of
+            images in article
             - img_selector(list): css selector for images living inside the article
             container
-            - p_selector(list): css selector for paragraphs living inside the article container
+            - p_selector(list): css selector for paragraphs living inside the
+              article container
             - t_selector(list): css selector for title living inside the container
         Return:
             -imgs(lst): list where each element is an instance of a Image Class
@@ -112,10 +109,12 @@ class NewsmaxExtractor(Extractor):
         Extract the image content from an HTML:
         Inputs:
             - html(str): html to extract images from
-            - img_p_selector(list): list of css selector for the parent elements of images in articles
+            - img_p_selector(list): list of css selector for the parent elements
+            of images in articles
             - img_selector(list): css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as an image object
+            -imgs(lst): list where each element is an image represented as
+            an image object
         """
         imgs = []
 
@@ -124,7 +123,6 @@ class NewsmaxExtractor(Extractor):
         # Obtain img info and captions which in the Daily both live inside the
         # same parent element (img_container)
         for container in img_container:
-
             # Inside the image container when grabbing the caption there are two elements
             # The first has empty text while the second one contains the caption
             caption = container.cssselect("div.artCaptionContainer")[1].text

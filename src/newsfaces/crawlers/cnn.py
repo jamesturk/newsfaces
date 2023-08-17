@@ -25,9 +25,9 @@ STOP_WORKING_DATE = datetime.datetime(
 )
 
 
-class CnnCrawler(WaybackCrawler):
+class CnnArchive(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("cnn")
         self.start_url = "https://www.cnn.com/politics/"
         self.selector = ["div.container__item", "h3.cd__headline"]
         self.session_js = requests.Session()

@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from enum import Enum
 
 
-class ArticleURL(BaseModel):
+class URL(BaseModel):
     url: str
     source: str
 
