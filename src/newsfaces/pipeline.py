@@ -127,8 +127,9 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
 pipeline.add_splitter(
     "archive_response",
     Splitter(
-        func=lambda x: x.source,
+        func=lambda x: x["archive_url"].source,
         splitter_map=splitter_map,
+        whole_record=True,
     ),
 )
 
