@@ -22,7 +22,7 @@ class APArchive(WaybackCrawler):
         Returns:
             A list of article URLs on that page.
         """
-        doc = lxml.html.fromstring(response.response_body)
+        doc = lxml.html.fromstring(response.text)
         selectors = [
             "div.FourColumnContainer-column",
             "div.TwoColumnContainer7030",

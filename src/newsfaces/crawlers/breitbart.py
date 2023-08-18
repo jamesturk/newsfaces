@@ -10,7 +10,7 @@ class BreitbartArchive(WaybackCrawler):
         self.selector = ["article"]
 
     def get_archive_urls(self, response):
-        doc = lxml.html.fromstring(response.response_body)
+        doc = lxml.html.fromstring(response.text)
         urls = []
         article_elements = doc.cssselect("article")
         for article in article_elements:
