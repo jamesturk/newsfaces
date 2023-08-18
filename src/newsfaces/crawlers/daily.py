@@ -1,4 +1,3 @@
-import re
 import datetime
 from newsfaces.models import URL
 from ..crawler import Crawler
@@ -8,8 +7,10 @@ from ..models import Image, ImageType
 
 CURRENT_YEAR = datetime.datetime.now().year
 
+
 class Done(Exception):
     pass
+
 
 class DailyCrawler(Crawler):
     def __init__(self):
@@ -42,15 +43,12 @@ class DailyCrawler(Crawler):
             if link.startswith("http://checkyourfact"):
                 continue
             full_link = make_link_absolute(link, self.prefix)
-            year = re.search(r"\d{4}", full_link).group()
             yield URL(url=full_link, source=self.source)
 
     def crawl(self, start_date=datetime.date(2015, 1, 1)):
         """
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
-        min_year = start_date.year
-        years = list(range(min_year, CURRENT_YEAR + 1, 1))
         page = 1
         while True:
             print("Obtaining results for page", page)
