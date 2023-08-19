@@ -51,7 +51,6 @@ class NYTCrawler(Crawler):
         begin_date = begin_date.strftime("%Y%m%d")
         end_date = end_date.strftime("%Y%m%d")
 
-        tags_copy = tags[:]
         filters_copy = filters[:]
 
         # Create URL
