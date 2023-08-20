@@ -64,7 +64,7 @@ class Crawler:
         Returns:
             A list of article URLs on that page.
         """
-        doc = lxml.html.fromstring(response.response_body)
+        doc = lxml.html.fromstring(response.text)
         urls = []
         for selector in self.selector:
             container = doc.cssselect(selector)

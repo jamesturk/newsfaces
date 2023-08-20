@@ -16,7 +16,7 @@ typer = "^0.9.0"
 jupyter = "^1.0.0"
 wayback = "^0.4.2"
 pytz = "^2023.3"
-databeakers = "0.3.2"
+databeakers = "0.3.4"
 #databeakers = {path = "../beakers", develop = true}
 
 

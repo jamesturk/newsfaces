@@ -16,7 +16,7 @@ class NBCArchive(WaybackCrawler):
         Implement get_archive_urls here to override behavior
         """
         # Retrieve the raw HTML content
-        html = response.response_body
+        html = response.text
         # Define the pattern and delimiter
         pattern = f'href="{url}'
 

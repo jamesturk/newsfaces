@@ -62,7 +62,7 @@ class BBCArchive(WaybackCrawler):
         self.source = "bbc_archive"
 
     def get_article_urls(self, response):
-        doc = lxml.html.fromstring(response.response_body)
+        doc = lxml.html.fromstring(response.text)
         xpath_sel = ["article", "video"]
         articles = set()
         videos = set()
