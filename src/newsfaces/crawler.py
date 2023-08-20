@@ -100,19 +100,24 @@ class WaybackCrawler(Crawler):
         self.client = WaybackClient(self.session)
         self.source_name = source_name
         self.prefix = "https://web.archive.org/"
-        self.start_date = start_date
-        self.end_date = end_date
         self.delta_hrs = delta_hrs
 
-    def get_wayback_urls(self) -> Generator[URL, None, None]:
+    def get_wayback_urls(self, when: str) -> Generator[URL, None, None]:
         """
         Yield all wayback URLs between start_date and end_date
-        """
 
-        date_cursor = self.start_date
+        """
+        # seed arguments are strings for CLI use
+        # for now simplify to a year, but could be more complex
+        # (e.g. for CNN?)
+        year = int(when)
+        start_date = datetime.datetime(year, 1, 1, 0, 0, tzinfo=pytz.timezone("utc"))
+        end_date = datetime.datetime(year + 1, 1, 1, 0, 0, tzinfo=pytz.timezone("utc"))
+
+        date_cursor = start_date
         # this is designed to loop through all results while never yielding back
         # two results that are too close together
-        while date_cursor < self.end_date:
+        while date_cursor < end_date:
             # this creates an iterator (results) that provides all results
             # starting at from_date
             results = self.client.search(
@@ -144,7 +149,7 @@ class WaybackCrawler(Crawler):
                     log.info("archive record", time=record.timestamp, skip=True)
 
                 # if outer loop has reached the end, break out of inner loop
-                if date_cursor > self.end_date:
+                if date_cursor > end_date:
                     break
 
     def get_article_urls(self, response: HttpResponse) -> Generator[URL, None, None]:
