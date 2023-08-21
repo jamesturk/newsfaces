@@ -1,5 +1,7 @@
 from ..crawler import WaybackCrawler
 from ..utils import make_link_absolute
+from ..models import Image, ImageType
+from ..extract_html import Extractor
 import lxml.html
 
 
