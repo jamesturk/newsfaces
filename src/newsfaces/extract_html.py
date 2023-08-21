@@ -92,7 +92,6 @@ class Extractor(object):
                 for j in img_selector:
                     photos = container.cssselect(j)
                     for i in photos:
-                        print(i)
                         caption_text = self.get_img_caption(i)
                         img_item = Image(
                             url=i.get("src") or "",
