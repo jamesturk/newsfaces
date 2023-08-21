@@ -1,5 +1,5 @@
 from newsfaces.models import Article, Image, ImageType
-import lxml
+import lxml.html
 
 
 class Extractor(object):
@@ -36,6 +36,7 @@ class Extractor(object):
         imgs = []
 
         for selector in self.article_body:
+            print(selector)
             if len(html.cssselect(selector)[0]) > 0:
                 article_body = html.cssselect(selector)[0]
                 break
