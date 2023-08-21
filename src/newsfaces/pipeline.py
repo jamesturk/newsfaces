@@ -65,7 +65,7 @@ SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
     "daily": (DailyCrawler(), None),
     "fox_api": (Fox_API(), None),
-    "newsmax": (NewsmaxCrawler(2021), None),
+    "newsmax": (NewsmaxCrawler(), None),
     "npr": (NprCrawler(), None),
     "nyt": (NYTCrawler(), None),
     "politico": (Politico(), None),
@@ -106,10 +106,10 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
     """
     Wayback crawlers start with archive_urls, these are archive.org URLs to be crawled.
     """
-    pipeline.add_seed(
-        source,
-        "archive_url",
+    pipeline.register_seed(
         crawler.get_wayback_urls,
+        "archive_url",
+        seed_name=source,
     )
 
     """
@@ -149,7 +149,7 @@ crawler.crawl directly, since it returns a iterable of URLs.
 for source, classes in SOURCE_MAPPING.items():
     (crawler, extractor) = classes
     pipeline.add_beaker(f"{source}_url", URL)
-    pipeline.add_seed(source, f"{source}_url", crawler.crawl)
+    pipeline.register_seed(crawler.crawl, f"{source}_url", seed_name=source)
 
 """
 We continue defining the pipeline, from this point forward it is the same for both.
@@ -174,4 +174,4 @@ for source, classes in itertools.chain(
         },
     )
     if extractor:
-        pipeline.add_transform(f"{source}_response", "article", extractor)
+        pipeline.add_transform(f"{source}_response", "article", extractor.scrape)

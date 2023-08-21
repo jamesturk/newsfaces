@@ -1,4 +1,3 @@
-import re
 import datetime
 from newsfaces.models import URL
 from ..crawler import Crawler
@@ -7,6 +6,10 @@ from ..extract_html import Extractor
 from ..models import Image, ImageType
 
 CURRENT_YEAR = datetime.datetime.now().year
+
+
+class Done(Exception):
+    pass
 
 
 class DailyCrawler(Crawler):
@@ -29,7 +32,10 @@ class DailyCrawler(Crawler):
         """
         url = self.url + "page/{}/".format(page)
         root = self.make_request(url)
-        article_elements = root.cssselect("article.relative")
+        article_elements = list(root.cssselect("article.relative"))
+        if not article_elements:
+            raise Done()
+
         for article in article_elements:
             link = article.cssselect("a")[0].get("href")
             # Some articles in the Daily Caller politcs section
@@ -37,24 +43,20 @@ class DailyCrawler(Crawler):
             if link.startswith("http://checkyourfact"):
                 continue
             full_link = make_link_absolute(link, self.prefix)
-            year = re.search(r"\d{4}", full_link).group()
-            yield URL(url=full_link, source=self.source), int(year)
+            yield URL(url=full_link, source=self.source)
 
     def crawl(self, start_date=datetime.date(2015, 1, 1)):
         """
         Starting from 2023 it fetches the urls of the daily caller politics section
         """
-        min_year = start_date.year
-        years = list(range(min_year, CURRENT_YEAR + 1, 1))
         page = 1
-        for year in reversed(years):
-            print("Obtaining links for", year)
-            article_year = 2023
-            while article_year >= year:
-                print("Obtaining results for page", page)
-                for url, year in self.obtain_page_urls(str(page)):
-                    yield url
-                page += 1
+        while True:
+            print("Obtaining results for page", page)
+            try:
+                yield from self.obtain_page_urls(str(page))
+            except Done:
+                break
+            page += 1
 
 
 class DailyExtractor(Extractor):

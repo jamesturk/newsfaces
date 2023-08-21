@@ -1,5 +1,5 @@
-from .utils import page_grab
-from .models import Article, Image, ImageType
+from newsfaces.models import Article, Image, ImageType
+import lxml
 
 
 class Extractor(object):
@@ -14,9 +14,9 @@ class Extractor(object):
 
     def extract_html(self, html):
         """
-        Extract the image and text content from and HTML:
+        Extract the image and text content from and Html:
         Inputs:
-            - html(str): Full html of an artcile url
+            - Html(str): Full Parsed Html of an article url
             - article_selector(str): css selector for article container
             - head_img_div(list)- css selector for parent div of headline image
             - head_img_select(list)- css selector for images
@@ -53,7 +53,7 @@ class Extractor(object):
 
     def extract_text(self, html, p_selector):
         """
-        Extract the article text content from an HTML:
+        Extract the article text content from an parsed HTML string:
         Inputs:
             - p_selector(list): css selectors for paragraphs living
               inside the article container
@@ -73,15 +73,16 @@ class Extractor(object):
 
     def extract_head_img(self, html, img_p_selector, img_selector):
         """
-        Extract the image content from an HTML:
+        Extract the image content from parsed HTML:
         Inputs:
-            - html(str): html to extract images from
+            - html(str): Html from HTTP request
             - img_p_selector(list): css selector for the parent elements of images
             - img_selector(list): list of css selector for the image elements
             Return:
             -imgs(lst): list where each element is an image represented as a dictionary
             with src, alt, title, and caption as fields
         """
+        imgs = []
         for selector in img_p_selector:
             img_container = html.cssselect(selector)
             if len(img_container) == 0:
@@ -96,14 +97,16 @@ class Extractor(object):
                             caption=i.get("caption") or "",
                             alt_text=i.get("alt") or "",
                         )
+                        imgs.append(img_item)
                     break
-        return [img_item]
+
+        return imgs
 
     def extract_imgs(self, html, img_p_selector, img_selector):
         """
-        Extract the image content from an HTML:
+        Extract the image content from an HTTP Request:
         Inputs:
-            - html(str): html to extract images from
+            - html(str): parsed html string to extract images from
             - img_p_selector(list): css selector for the parent elements of images
             - img_selector(list): css selector for the image elements
             Return:
@@ -122,10 +125,16 @@ class Extractor(object):
                             caption=i.get("caption") or "",
                             alt_text=i.get("alt") or "",
                         )
-                    imgs.append(img_item)
+                        imgs.append(img_item)
         return imgs
 
     def extract_social_media_image(self, html):
+        """
+        extract social media tagged meta image
+        input:
+        html (parsed string)- page html
+        returns: image object
+        """
         container = html.cssselect('meta[property="og:image"]')
         img_item = Image(
             url=container[0].get("content"),
@@ -135,11 +144,11 @@ class Extractor(object):
         )
         return [img_item]
 
-    def scrape(self, url):
+    def scrape(self, response):
         """
-        Extract html and from
+        Return article object from html string request
         """
-        html = page_grab(url)
+        html = lxml.html.fromstring(response.text)
         imgs, art_text, t_text = self.extract_html(html)
         article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
         return article
