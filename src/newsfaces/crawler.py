@@ -69,15 +69,14 @@ class Crawler:
         for selector in self.selector:
             container = doc.cssselect(selector)
             for j in container:
-                atr = j.cssselect("a")
+                atr = j.cssselect("a[href]")
                 if atr and len(atr) > 0:
                     href = atr[0].get("href")
-                    if len(href) > 0:
-                        if self.prefix is not None:
-                            urls.append(make_link_absolute(href, self.prefix))
-                        else:
-                            urls.append(href)
-        return urls
+                    if self.prefix is not None:
+                        urls.append(make_link_absolute(href, self.prefix))
+                    else:
+                        urls.append(href)
+        yield from urls
 
 
 class WaybackCrawler(Crawler):
