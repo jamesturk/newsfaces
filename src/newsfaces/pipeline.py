@@ -95,7 +95,7 @@ pipeline.add_transform(
     RateLimit(HttpRequest(), 1),
     error_map={
         (httpx.ReadTimeout,): "archive_timeouts",
-        (httpx.RequestError,): "archive_errors",
+        (httpx.RequestError, httpx.InvalidURL): "archive_errors",
     },
 )
 
@@ -164,13 +164,16 @@ for source, classes in itertools.chain(
 ):
     (crawler, extractor) = classes
     pipeline.add_beaker("article", Article)
+    transform = HttpRequest()
+    if source == "newsmax":
+        transform = RateLimit(transform, 0.01)
     pipeline.add_transform(
         f"{source}_url",
         f"{source}_response",
-        HttpRequest(),
+        transform,
         error_map={
             (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError,): "errors",
+            (httpx.RequestError, httpx.InvalidURL): "errors",
         },
     )
     if extractor:
