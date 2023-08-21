@@ -1,11 +1,12 @@
-from ..crawler import WaybackCrawler
-from ..utils import make_link_absolute
-from databeakers.http import HttpResponse
-from ..models import URL
+import re
 import lxml.html
 import requests
 import datetime
 import pytz
+from databeakers.http import HttpResponse
+from ..crawler import WaybackCrawler
+from ..utils import make_link_absolute
+from ..models import URL
 from typing import Generator
 
 # The results for https://cnn.com/politics have different types of answers
@@ -34,16 +35,12 @@ class CnnArchive(WaybackCrawler):
         self.selector = ["div.container__item", "h3.cd__headline"]
         self.session_js = requests.Session()
 
-    def get_archive_urls_njs(self, url, selectors):
-        return super().get_archive_urls(url, selectors)
-
-    def get_archive_urls_js(self, wayback_record):
+    def get_archive_urls_js(self, time_str):
         urls = []
-        time_stamp = wayback_record.timestamp.strftime("%Y%m%d%H%M%S")
-        json_url = """https://web.archive.org/web/{}/https://www.cnn.com/
-        data/ocs/section/politics/index.html:politics-zone-1/
-        views/zones/common/zone-manager.izl""".format(
-            time_stamp
+        json_url = (
+            f"https://web.archive.org/web/{time_str}/"
+            "https://www.cnn.com/data/ocs/section/politics/index.html:"
+            "politics-zone-1/views/zones/common/zone-manager.izl"
         )
         resp = self.session_js.get(json_url)
         resp_json = resp.json()
@@ -57,10 +54,16 @@ class CnnArchive(WaybackCrawler):
             rel_link = article.cssselect("a")[0].get("href")
             absolute_link = make_link_absolute(rel_link, "https://www.cnn.com")
 
-            urls.append(absolute_link)
+            urls.append(URL(url=absolute_link, source=self.source_name))
 
         return urls
 
     def get_article_urls(self, response: HttpResponse) -> Generator[URL, None, None]:
-        print(response.url)
-        # breakpoint()
+        time_str = re.findall(r"(\d{14})", response.url)[0]
+        time_stamp = datetime.datetime.strptime(time_str, "%Y%m%d%H%M%S").astimezone(
+            pytz.timezone("utc")
+        )
+        if JS_START_DATE < time_stamp < JS_END_DATE:
+            yield from self.get_archive_urls_js(time_str)
+        else:
+            yield from super().get_archive_urls(response)
