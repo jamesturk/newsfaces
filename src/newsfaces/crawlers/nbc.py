@@ -18,4 +18,3 @@ class NBCArchive(WaybackCrawler):
             for link_pattern in self.link_patterns:
                 if link_pattern in link:
                     yield URL(url=link, source=self.source_name)
-

@@ -1,8 +1,8 @@
 import itertools
 from databeakers.pipeline import Pipeline
-from databeakers.edges import Splitter, Transform
+from databeakers.edges import FieldSplitter, Transform
 from databeakers.http import HttpResponse, HttpRequest
-from databeakers.transforms import RateLimit
+from databeakers.wrappers import RateLimit
 import httpx
 from .models import URL, Article
 from .pipeline_helpers import (
@@ -133,9 +133,10 @@ for source, classes in WAYBACK_SOURCE_MAPPING.items():
 
 pipeline.add_splitter(
     "archive_response",
-    Splitter(
-        func=lambda x: x["archive_url"].source,
-        splitter_map=splitter_map,
+    FieldSplitter(
+        "source",
+        splitter_map,
+        beaker_name="archive_url",
         whole_record=True,
     ),
 )
