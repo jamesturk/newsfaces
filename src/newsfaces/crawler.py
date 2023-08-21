@@ -100,6 +100,11 @@ class WaybackCrawler(Crawler):
         self.source_name = source_name
         self.prefix = "https://web.archive.org/"
         self.delta_hrs = delta_hrs
+        # adding edge-level deduping
+        # TODO: this won't work well for all cases, but since in ours it is nearby items
+        # that tend to have duplicates it will work well enough
+        #   solving this more generically is a hard problem so we'll leave it for now
+        self.seen = set()
 
     def get_wayback_urls(self, when: str) -> Generator[URL, None, None]:
         """
@@ -159,6 +164,8 @@ class WaybackCrawler(Crawler):
         # convert to normal URLs
         for item in articles:
             if "/web/" in item or "web.archive.org" in item:
-                yield URL(url=memento_url_data(item)[0], source=self.source_name)
-            else:
+                # this is a wayback URL, so we need to extract the original URL
+                item = memento_url_data(item)[0]
+            if item not in self.seen:
+                self.seen.add(item)
                 yield URL(url=item, source=self.source_name)
