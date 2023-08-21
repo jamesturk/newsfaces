@@ -149,21 +149,21 @@ class Extractor(object):
             alt_text="",
         )
         return [img_item]
-    
+
     def get_img_caption(self, img):
-        '''
+        """
         if img has a figure attribute, get the related figure caption
         input: image-parsed html for inage tage
-        output: figure caption text 
+        output: figure caption text
 
-        '''
+        """
         figcaption = img.xpath("ancestor::figure/figcaption")
         if figcaption:
             caption_text = figcaption[0].text_content().strip()
         else:
             caption_text = ""
-        return caption_text   
-    
+        return caption_text
+
     def get_video_imgs(self):
         return []
 
@@ -175,4 +175,3 @@ class Extractor(object):
         imgs, art_text, t_text = self.extract_html(html)
         article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
         return article
-    
