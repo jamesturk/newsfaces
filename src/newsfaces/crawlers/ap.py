@@ -1,18 +1,21 @@
+
 from .crawler import WaybackCrawler
 import datetime
 import pytz
 from newsfaces.extract_html import Extractor
 from newsfaces.utils import make_link_absolute
+import lxml.html
 
 
-class AP(WaybackCrawler):
+class APArchive(WaybackCrawler):
     def __init__(self):
         super().__init__()
         self.urls = ["https://apnews.com/politics", "https://apnews.com/hub/politics"]
+        super().__init__("ap")
         self.start_url = ""
         self.selector = []
 
-    def get_archive_urls(self, url, selectors):
+    def get_article_urls(self, response):
         """
         This function takes a URLs and returns lists of URLs
         for containing each article on that page.
@@ -25,8 +28,7 @@ class AP(WaybackCrawler):
         Returns:
             A list of article URLs on that page.
         """
-        response = self.make_request(url)
-        urls = []
+        doc = lxml.html.fromstring(response.text)
         selectors = [
             "div.FourColumnContainer-column",
             "div.TwoColumnContainer7030",
@@ -34,18 +36,16 @@ class AP(WaybackCrawler):
             "article",
         ]
         for a in selectors:
-            container = response.cssselect(a)
+            container = doc.cssselect(a)
             if len(container) > 0:
-                urls += self.parse_links(container)
+                yield from self.parse_links(container)
         xpath_sel = ["TwoColumnContainer", "CardHeadline"]
-        # for items that have random characters continually added
-        # at the end so we do non-exact matching
+        # for items that have random characters continually added at the end so we do
+        # non-exact matching
         for j in xpath_sel:
             container = response.xpath(f"//div[contains(@class, '{j}')]")
             if len(container) > 0:
-                urls += self.parse_links(container)
-
-        return urls
+                yield from self.parse_links(container)
 
     def crawl(self, startdate, enddate, delta_hrs=6):
         if startdate < datetime.datetime(
@@ -59,6 +59,7 @@ class AP(WaybackCrawler):
         self.start_url = self.urls[0]
         current_site = super().crawl(startdate, enddate, delta_hrs)
         return hub_site.union(current_site)
+
 
     def parse_links(self, container):
         """
@@ -77,6 +78,7 @@ class AP(WaybackCrawler):
         return urls
 
 
+
 class AP_Extractor(Extractor):
     def __init__(self):
         super().__init__()
@@ -88,3 +90,11 @@ class AP_Extractor(Extractor):
         self.head_img_select = ["img"]
         self.p_selector = ["p"]
         self.t_selector = ["h1.Page-headline"]
+
+    def get_wayback_urls(self):
+        self.start_url = "https://apnews.com/hub/politics"
+        yield from super().get_wayback_urls()
+        # change_date = datetime.datetime(2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc"))
+        # self.start_url = "https://apnews.com/politics"
+        # yield from super().get_wayback_urls()
+

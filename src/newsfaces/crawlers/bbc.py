@@ -1,37 +1,29 @@
-from .crawler import Crawler, WaybackCrawler
+from ..crawler import Crawler, WaybackCrawler
+import lxml.html
 from newsfaces.utils import make_link_absolute
+from newsfaces.models import URL
 
 
 class BBC_Latest(Crawler):
     def __init__(self):
         super().__init__()
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t?page=1"
+        self.source = "bbc_latest"
 
     def crawl(self):
         """
         run get_html with correct initial html from init
         """
-        return self.get_newslink(self.start_url)[0]
+        url = self.start_url
+        pagenumber = 0
+        while pagenumber < 42:
+            yield from self.get_urls(url)
+            pagenumber += 1
+            # TODO: why 42?
+            if pagenumber < 42:
+                url = url[: -len(str(pagenumber))] + str(pagenumber + 1)
 
-    def get_newslink(self, url, articles=set(), videos=set()):
-        """
-        Takes an initial url and runs get_urls on all possible
-        API queries. Gathering all possible articles and videos
-        from the API into a set.
-        """
-        article, video = self.get_urls(url)
-        articles = articles.union(article)
-        videos = videos.union(video)
-        begin = url.find("page=") + 5
-        pagenumber = int(url[begin : len(url)])
-        if pagenumber < 42:
-            newlink = url[: -len(str(pagenumber))] + str(pagenumber + 1)
-            article, video = self.get_newslink(newlink, articles, videos)
-            articles = articles.union(article)
-            videos = videos.union(video)
-        return articles, videos
-
-    def get_urls(self, url, articles=set(), videos=set()):
+    def get_urls(self, url):
         """
         This function takes a URLs and returns lists of URLs
         for containing each article and video on that page.
@@ -57,44 +49,34 @@ class BBC_Latest(Crawler):
                 href = a[0].get("href")
                 href = make_link_absolute(href, "https://www.bbc.com")
             if type == "article":
-                articles.add(href)
+                yield URL(url=href, source=self.source)
             elif type == "video":
-                videos.add(href)
-        return articles, videos
+                pass  # TODO: video
 
 
-class BBC(WaybackCrawler):
+class BBCArchive(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("bbc")
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t"
         self.selector = ["div.archive__item__content", "h2.node__title.node-title"]
+        self.source = "bbc_archive"
 
-    def get_archive_urls(self, url, selector):
-        return self.get(url)
-
-    def get(self, url, articles=set(), videos=set()):
-        """
-        This function takes a URLs and returns lists of URLs
-        for containing each article and video on that page.
-
-        Parameters:
-            * url:  a URL to a page of articles
-
-        Returns:
-            A list of URLs to each video and article on that page.
-        """
-        response = self.make_request(url)
+    def get_article_urls(self, response):
+        doc = lxml.html.fromstring(response.text)
         xpath_sel = ["article", "video"]
+        articles = set()
+        videos = set()
         # for items that have random characters continually added at the
         # end so we do non-exact matching
         for j in xpath_sel:
-            container = response.xpath(f"//div[contains(@type, '{j}')]")
+            container = doc.xpath(f"//div[contains(@type, '{j}')]")
             if container:
                 for j in container:
                     a = j[0].cssselect("a")
                     href = a[0].get("href")
                     href = make_link_absolute(href, "https://web.archive.org")
                     if j == "article":
+                        yield URL(url=href, source=self.source)
                         articles.add(href)
                     else:
                         videos.add(href)

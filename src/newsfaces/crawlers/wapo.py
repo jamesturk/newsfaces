@@ -1,20 +1,38 @@
 import json
-from .crawler import Crawler, WaybackCrawler
+from ..crawler import Crawler, WaybackCrawler
 from newsfaces.utils import make_link_absolute
+from newsfaces.models import URL
 
 
 class WashingtonPost_API(Crawler):
     def __init__(self):
         super().__init__()
-        self.start_url = "https://www.washingtonpost.com/prism/api/prism-query?_website=washpost&query=%7B%22query%22%3A%22prism%3A%2F%2Fprism.query%2Fsite-articles-only%2C%2Fpolitics%26offset%3D600%26limit%3D30%22%7D"
+        self.start_url = (
+            "https://www.washingtonpost.com/prism/api/prism-query?_website=washpost"
+            "&query=%7B%22query%22%3A%22prism%3A%2F%2Fprism.query%2Fsite-articles-only"
+            "%2C%2Fpolitics%26offset%3D600%26limit%3D30%22%7D"
+        )
+        self.source = "wapo_api"
 
     def crawl(self):
         """
         run get_html with correct initial html from init
         """
-        return self.get_html(self.start_url)[0]  # only return articles for now
+        url = self.start_url
+        articlenumber = 0
+        while articlenumber < 9960:
+            yield from self.get_html(url)
 
-    def get_html(self, base_page, article=set(), video=set()):
+            begin = url.find("offset") + 9
+            end = url.find("%26limit")
+            try:
+                articlenumber = int(url[begin:end])
+            except ValueError:
+                break
+            articlenumber += 30
+            url = url[:begin] + str(articlenumber) + url[end:]
+
+    def get_html(self, base_page):
         """
         From an initial API query page, run through all possible
         API queries-- putting articles on the pages into
@@ -31,35 +49,19 @@ class WashingtonPost_API(Crawler):
                 url_text, "https://www.washingtonpost.com/politics"
             )
             if url.startswith("https://www.washingtonpost.com/politics"):
-                article.add(url)
+                yield URL(url=url, source=self.source)
             else:
-                video.add(url)
-        begin = base_page.find("offset") + 9
-        end = base_page.find("%26limit")
-        try:
-            articlenumber = int(base_page[begin:end])
-        except ValueError:
-            articlenumber = 10000
-        if articlenumber < 9960:
-            articlenumber += 30
-            articlenumber = str(articlenumber)
-            rev_basepage = (
-                base_page[0:begin]
-                + articlenumber
-                + base_page[end : (len(base_page) + 1)]
-            )
-            article, video = self.get_html(rev_basepage, article, video)
-        return article, video
+                pass  # TODO: video
 
 
-class WashingtonPost(WaybackCrawler):
+class WashingtonPostArchive(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("wapo")
         self.start_url = "https://www.washingtonpost.com/politics/"
         self.selector = ["div.story-headline.pr-sm"]
 
-    def get_archive_urls(self, url, selectors):
-        articles = super().get_archive_urls(url, selectors)
+    def get_article_urls(self, response):
+        articles = super().get_article_urls(response)
         filtered_articles = [
             article
             for article in articles

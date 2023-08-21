@@ -1,32 +1,34 @@
-from .ap import AP
-from .bbc import BBC, BBC_Latest
-from .breitbart import BreitbartCrawler
-from .cnn import CnnCrawler
+from .ap import APArchive
+from .bbc import BBCArchive, BBC_Latest
+from .breitbart import BreitbartArchive
+from .cnn import CnnArchive
 from .daily import DailyCrawler
-from .fox import Fox, Fox_API
-from .hill import TheHill
-from .nbc import NBC
+from .fox import FoxArchive, Fox_API
+from .hill import TheHillArchive
+from .nbc import NBCArchive
 from .newsmax import NewsmaxCrawler
 from .npr import NprCrawler
+from .nyt import NYTCrawler
 from .politico import Politico
-from .wapo import WashingtonPost, WashingtonPost_API
-from .washington_times import WashingtonTimes
+from .wapo import WashingtonPostArchive, WashingtonPost_API
+from .washington_times import WashingtonTimesArchive
 
 __all__ = [
-    "AP",
-    "BBC",
+    "APArchive",
+    "BBCArchive",
     "BBC_Latest",
-    "BreitbartCrawler",
-    "CnnCrawler",
+    "BreitbartArchive",
+    "CnnArchive",
     "DailyCrawler",
-    "Fox",
+    "FoxArchive",
     "Fox_API",
-    "TheHill",
-    "NBC",
+    "TheHillArchive",
+    "NBCArchive",
     "NewsmaxCrawler",
     "NprCrawler",
+    "NYTCrawler",
     "Politico",
-    "WashingtonPost",
+    "WashingtonPostArchive",
     "WashingtonPost_API",
-    "WashingtonTimes",
+    "WashingtonTimesArchive",
 ]

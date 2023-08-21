@@ -1,19 +1,18 @@
-from .crawler import WaybackCrawler, WaybackClient, WaybackSession
-from newsfaces.utils import make_link_absolute
+from ..crawler import WaybackCrawler
+from ..utils import make_link_absolute
+import lxml.html
 
 
-class BreitbartCrawler(WaybackCrawler):
+class BreitbartArchive(WaybackCrawler):
     def __init__(self):
-        super().__init__()
+        super().__init__("breitbart")
         self.start_url = "https://www.breitbart.com/politics/"
-        self.session = WaybackSession()
-        self.client = WaybackClient(self.session)
-        self.selector = None
+        self.selector = ["article"]
 
-    def get_archive_urls(self, url, selector=[""]):
-        response = self.make_request(url)
+    def get_archive_urls(self, response):
+        doc = lxml.html.fromstring(response.text)
         urls = []
-        article_elements = response.cssselect("article")
+        article_elements = doc.cssselect("article")
         for article in article_elements:
             atr = article.cssselect("a")
             if atr and len(atr) > 0:
