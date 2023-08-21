@@ -33,7 +33,17 @@ class NprCrawler(Crawler):
             link = element.cssselect("a")
             href = link[0].get("href")
             links_list.append(href)
-        month = re.search(r"(?<=\d{4}/)\d{2}", links_list[-1]).group()
+        #Retrieve month of last article 
+        month_search = re.search(r"(?<=\d{4}/)\d{2}", links_list[-1])
+        #Check first if is retrievable
+        if month_search:
+            month = re.search(r"(?<=\d{4}/)\d{2}", links_list[-1]).group()
+        #If not retrivable keep month of date used as input into the function
+        else:
+            if "-" in date[:2]:
+                month = int(date[:1])
+            else:
+                month = int(date[:2])
 
         url_set = set(links_list)
 
