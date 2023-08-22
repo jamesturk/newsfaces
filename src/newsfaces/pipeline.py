@@ -25,11 +25,10 @@ from .crawlers import (
     WashingtonPostArchive,
     WashingtonPost_API,
     WashingtonTimesArchive,
-    #Extractors
+    # Extractors
     Politico_Extractor,
     Hill_Extractor,
-    Fox_Extractor
-
+    Fox_Extractor,
 )
 
 """
