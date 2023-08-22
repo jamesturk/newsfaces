@@ -44,6 +44,7 @@ class Extractor(object):
             imgs += self.extract_head_img(html, self.head_img_div, self.head_img_select)
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
         imgs += self.extract_social_media_image(html)
+        imgs += self.get_video_imgs()
         art_text = self.extract_text(article_body, self.p_selector)
 
         for t in self.t_selector:
@@ -92,10 +93,11 @@ class Extractor(object):
                 for j in img_selector:
                     photos = container.cssselect(j)
                     for i in photos:
+                        caption_text = self.get_img_caption(i)
                         img_item = Image(
                             url=i.get("src") or "",
                             image_type=ImageType("main"),
-                            caption=i.get("caption") or "",
+                            caption=caption_text,
                             alt_text=i.get("alt") or "",
                         )
                         imgs.append(img_item)
@@ -116,14 +118,17 @@ class Extractor(object):
         imgs = []
         for selector in img_p_selector:
             img_container = html.cssselect(selector)
+            if len(img_container) == 0:
+                continue
             for container in img_container:
                 for j in img_selector:
                     photos = container.cssselect(j)
                     for i in photos:
+                        caption_text = self.get_img_caption(i)
                         img_item = Image(
                             url=i.get("src") or "",
                             image_type=ImageType("main"),
-                            caption=i.get("caption") or "",
+                            caption=caption_text or "",
                             alt_text=i.get("alt") or "",
                         )
                         imgs.append(img_item)
@@ -144,6 +149,23 @@ class Extractor(object):
             alt_text="",
         )
         return [img_item]
+
+    def get_img_caption(self, img):
+        """
+        if img has a figure attribute, get the related figure caption
+        input: image-parsed html for inage tage
+        output: figure caption text
+
+        """
+        figcaption = img.xpath("ancestor::figure/figcaption")
+        if figcaption:
+            caption_text = figcaption[0].text_content().strip()
+        else:
+            caption_text = ""
+        return caption_text
+
+    def get_video_imgs(self):
+        return []
 
     def scrape(self, response):
         """
