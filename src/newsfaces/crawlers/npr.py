@@ -133,14 +133,16 @@ class NPRExtractor(Extractor):
 
         # Create captions list that live in other elements
         caption_items = html.cssselect("div.caption")
-        for item in caption_items:
-            caption = item.cssselect("p")[0].text
-            captions.append(caption)
+        if caption_items:
+            for item in caption_items:
+                caption = item.cssselect("p")
+                if caption:
+                    captions.append(caption[0].text)
 
         # Create image items joining each caption with their respective image
         # in case the length of captions and img_items match
 
-        if len(img_items) == len(caption_items):
+        if len(img_items) == len(captions):
             for i in range(len(img_items)):
                 image = Image(
                     url=img_items[i]["src"] or "",
