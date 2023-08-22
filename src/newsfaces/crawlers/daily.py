@@ -62,13 +62,13 @@ class DailyCrawler(Crawler):
 class DailyExtractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.article_body = ["div.article-content-wrap.sticky-columns"]
-        self.img_p_selector = ["div.m"]
+        self.article_body = ["div#ob-read-more-selector"]
+        self.img_p_selector = ["div.wp-caption"]
         self.img_selector = ["img"]
-        self.head_img_div = ["div.contain"]
-        self.head_img_select = ["img"]
         self.p_selector = ["p"]
         self.t_selector = ["h1"]
+        self.head_img_select = ["img"]
+        self.head_img_div = ["div.featured-image"]
 
     def extract_head_img(self, html, img_p_selector, img_selector):
         """
