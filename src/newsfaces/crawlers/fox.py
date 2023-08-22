@@ -1,7 +1,7 @@
 from ..models import URL
 from ..extract_html import Extractor
 from ..utils import make_link_absolute
-from .crawler import Crawler, WaybackCrawler
+from ..crawler import Crawler, WaybackCrawler
 import json
 
 

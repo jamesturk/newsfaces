@@ -29,8 +29,10 @@ class NewsmaxCrawler(Crawler):
         links_elements = root.cssselect("h5.archiveH5")
         for element in links_elements:
             link = element.cssselect("a")
-            href = make_link_absolute("https://newsmax.com", link[0].get("href"))
-            yield URL(url=href, source=self.source)
+            href = link[0].get("href")
+            if href:
+                href = make_link_absolute(link[0].get("href"), "https://newsmax.com")
+                yield URL(url=href, source=self.source)
 
     def crawl(self):
         """

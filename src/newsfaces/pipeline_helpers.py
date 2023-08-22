@@ -12,19 +12,6 @@ understand them to work with the pipeline.)
 """
 
 
-def make_comparator(source: str):
-    """
-    Build a comparator function to filter on source.
-    """
-
-    def fn(record: Record) -> bool:
-        return record["archive_url"].source == source
-
-    fn.__name__ = f"is_{source}"
-
-    return fn
-
-
 def make_extractor(beaker_name: str, fn):
     """
     Unwrap a Record.

@@ -1,11 +1,11 @@
 import itertools
 from databeakers.pipeline import Pipeline
+from databeakers.edges import FieldSplitter, Transform
 from databeakers.http import HttpResponse, HttpRequest
-from databeakers.transforms import RateLimit, Conditional
+from databeakers.wrappers import RateLimit
 import httpx
 from .models import URL, Article
 from .pipeline_helpers import (
-    make_comparator,
     make_extractor,
 )
 from .crawlers import (
@@ -51,7 +51,7 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
 """
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
-    "bbc_archive": (BBCArchive(), None),
+    "bbc": (BBCArchive(), None),
     "breitbart": (BreitbartArchive(), None),
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), None),
@@ -65,7 +65,7 @@ SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
     "daily": (DailyCrawler(), None),
     "fox_api": (Fox_API(), None),
-    "newsmax": (NewsmaxCrawler(2021), None),
+    "newsmax": (NewsmaxCrawler(), None),
     "npr": (NprCrawler(), None),
     "nyt": (NYTCrawler(), None),
     "politico": (Politico(), None),
@@ -83,58 +83,63 @@ It is important to understand, the below code is really just configuration.
 
 We run this code in a loop since each source has the same basic structure.
 """
+
+"""
+First we add the archive_url -> response transformation.
+"""
+pipeline.add_beaker("archive_url", URL)
+pipeline.add_beaker("archive_response", HttpResponse)
+pipeline.add_transform(
+    "archive_url",
+    "archive_response",
+    RateLimit(HttpRequest(), 1),
+    error_map={
+        (httpx.ReadTimeout,): "archive_timeouts",
+        (httpx.RequestError, httpx.InvalidURL): "archive_errors",
+    },
+)
+
+splitter_map = {}
 for source, classes in WAYBACK_SOURCE_MAPPING.items():
     (crawler, extractor) = classes
 
     """
-    Wayback crawlers start with archive_url, these are archive.org URLs to be crawled.
-
-    We define the beaker, and add a seed mapping source_name -> crawler.get_wayback_urls
+    Wayback crawlers start with archive_urls, these are archive.org URLs to be crawled.
     """
-    pipeline.add_beaker("archive_url", URL)
-    pipeline.add_seed(
-        source,
-        "archive_url",
+    pipeline.register_seed(
         crawler.get_wayback_urls,
-    )
-
-    """
-    Next we add a transformation from URL -> WebResponse with some error handling.
-    """
-    pipeline.add_beaker("archive_response", HttpResponse)
-    pipeline.add_transform(
         "archive_url",
-        "archive_response",
-        RateLimit(HttpRequest(), 1),
-        error_map={
-            (httpx.ReadTimeout,): "archive_timeouts",
-            (httpx.RequestError,): "archive_errors",
-        },
+        seed_name=source,
     )
 
     """
-    Finally we add a transformation from archive_response to {source}_url.
-      
-    {source}_url would now be populated with the URLs of the articles on the page.
+    Next we add the {source}_url beaker & create a transform that calls the appropriate
+    get_article_urls on the response.
 
-    This transform is a bit more complicated, because we want to split the archive_response
-    beaker (which is all sources mixed up) into different functions per-source.
-
-    Right now this code is IMO too complex, but it works. 
-    Once the interface is more stable, I've left a note to refactor this piece.
-
-    TODO: make_comparator could become Conditional(field="source", value=source) with a bit of work
+    We keep these transforms in a dict so we can use them later.
     """
     pipeline.add_beaker(f"{source}_url", URL)
-    pipeline.add_transform(
-        "archive_response",
-        f"{source}_url",
-        Conditional(
-            make_extractor("archive_response", crawler.get_article_urls),
-            make_comparator(source),
-        ),
-        whole_record=True,
+    splitter_map[source] = Transform(
+        to_beaker=f"{source}_url",
+        func=make_extractor("archive_response", crawler.get_article_urls),
+        name=f"{source}.get_article_urls",
+        allow_filter=True,
+        # TODO: right now some get_article_urls are returning empty lists
+        # you can see this by looking at the logs where you see something like
+        # transform (generator) with yield of 0 items
+        # if you set allow_filter=False, these will raise an exception instead
+        # of being ignored
     )
+
+pipeline.add_splitter(
+    "archive_response",
+    FieldSplitter(
+        "source",
+        splitter_map,
+        beaker_name="archive_url",
+        whole_record=True,
+    ),
+)
 
 """
 The setup for a non-wayback crawler is much more simple.
@@ -145,7 +150,7 @@ crawler.crawl directly, since it returns a iterable of URLs.
 for source, classes in SOURCE_MAPPING.items():
     (crawler, extractor) = classes
     pipeline.add_beaker(f"{source}_url", URL)
-    pipeline.add_seed(source, f"{source}_url", crawler.crawl)
+    pipeline.register_seed(crawler.crawl, f"{source}_url", seed_name=source)
 
 """
 We continue defining the pipeline, from this point forward it is the same for both.
@@ -160,14 +165,17 @@ for source, classes in itertools.chain(
 ):
     (crawler, extractor) = classes
     pipeline.add_beaker("article", Article)
+    transform = HttpRequest()
+    if source == "newsmax":
+        transform = RateLimit(transform, 0.01)
     pipeline.add_transform(
         f"{source}_url",
         f"{source}_response",
-        HttpRequest(),
+        transform,
         error_map={
             (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError,): "errors",
+            (httpx.RequestError, httpx.InvalidURL): "errors",
         },
     )
     if extractor:
-        pipeline.add_transform(f"{source}_response", "article", extractor)
+        pipeline.add_transform(f"{source}_response", "article", extractor.scrape)

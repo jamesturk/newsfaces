@@ -1,3 +1,4 @@
+from ..models import Image, ImageType
 from ..crawler import WaybackCrawler
 from ..extract_html import Extractor
 
