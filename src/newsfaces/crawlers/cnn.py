@@ -66,4 +66,4 @@ class CnnArchive(WaybackCrawler):
         if JS_START_DATE < time_stamp < JS_END_DATE:
             yield from self.get_archive_urls_js(time_str)
         else:
-            yield from super().get_archive_urls(response)
+            yield from super().get_article_urls(response)
