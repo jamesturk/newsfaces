@@ -174,7 +174,9 @@ class Extractor(object):
         if response.status_code < 400:
             html = lxml.html.fromstring(response.text)
             imgs, art_text, t_text = self.extract_html(html)
-            article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
+            article = Article(
+                title=t_text or "", article_text=art_text or "", images=imgs
+            )
             return article
         else:
             return None
