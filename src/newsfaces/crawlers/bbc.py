@@ -1,6 +1,7 @@
 from ..crawler import Crawler, WaybackCrawler
 from newsfaces.utils import make_link_absolute
 from newsfaces.models import URL
+from newsfaces.extract_html import Extractor
 
 
 class BBC_Latest(Crawler):
@@ -58,3 +59,15 @@ class BBCArchive(WaybackCrawler):
         super().__init__("bbc")
         self.start_url = "https://www.bbc.com/news/topics/cwnpxwzd269t"
         self.selector = ["article"]
+
+
+class BBC_Extractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["main"]
+        self.img_p_selector = ["figure", "div#mediaContainer"]
+        self.img_selector = ["img"]
+        self.head_img_div = []
+        self.head_img_select = []
+        self.p_selector = ["p"]
+        self.t_selector = ["h1"]

@@ -165,7 +165,7 @@ class Extractor:
         output: figure caption text
 
         """
-        figcaption = img.xpath("ancestor::figure/figcaption")
+        figcaption = img.xpath("ancestor::figure/figcaption | //figcaption")
         if figcaption:
             caption_text = figcaption[0].text_content().strip()
         else:
