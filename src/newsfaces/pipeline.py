@@ -178,7 +178,7 @@ for source, classes in itertools.chain(
         transform,
         error_map={
             (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError, httpx.InvalidURL): "errors",
+            (httpx.RequestError, httpx.InvalidURL, ValueError): "errors",
         },
     )
     if extractor:
