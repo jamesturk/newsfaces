@@ -30,6 +30,7 @@ from .crawlers import (
     Hill_Extractor,
     Fox_Extractor,
 )
+from .extract_html import MissingBodyError
 
 from .crawlers.npr import NPRExtractor
 from .crawlers.daily import DailyExtractor
@@ -177,14 +178,31 @@ for source, classes in itertools.chain(
     transform = HttpRequest()
     if source == "newsmax":
         transform = RateLimit(transform, 0.01)
+    elif source == "hill":
+        transform = HttpRequest(
+            headers={
+                "user-agent": (
+                    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/92.0.4515.107 Mobile Safari/537.36"
+                )
+            }
+        )
     pipeline.add_transform(
         f"{source}_url",
         f"{source}_response",
         transform,
         error_map={
             (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError, httpx.InvalidURL, ValueError): "errors",
+            (httpx.RequestError, httpx.InvalidURL, ValueError): f"errors",
+            (httpx.HTTPStatusError,): f"{source}_bad_response",
         },
     )
     if extractor:
-        pipeline.add_transform(f"{source}_response", "article", extractor.scrape)
+        pipeline.add_transform(
+            f"{source}_response",
+            "article",
+            extractor.scrape,
+            error_map={
+                (MissingBodyError,): "selector_errors",
+            },
+        )
