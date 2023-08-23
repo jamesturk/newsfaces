@@ -30,6 +30,7 @@ from .crawlers import (
     Hill_Extractor,
     Fox_Extractor,
 )
+from .extract_html import MissingBodyError
 
 """
 This file defines the pipeline for the newsfaces project.
@@ -182,4 +183,11 @@ for source, classes in itertools.chain(
         },
     )
     if extractor:
-        pipeline.add_transform(f"{source}_response", "article", extractor.scrape)
+        pipeline.add_transform(
+            f"{source}_response",
+            "article",
+            extractor.scrape,
+            error_map={
+                (MissingBodyError,): "selector_errors",
+            },
+        )

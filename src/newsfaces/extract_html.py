@@ -2,7 +2,11 @@ from newsfaces.models import Article, Image, ImageType
 import lxml.html
 
 
-class Extractor(object):
+class MissingBody(Exception):
+    pass
+
+
+class Extractor:
     def __init__(self):
         self.article_body = []
         self.img_p_selector = []
@@ -41,7 +45,7 @@ class Extractor(object):
                 article_body = results[0]
                 break
         else:
-            raise ValueError(f"No article body found selector={self.article_body}")
+            raise MissingBody(f"No article body found selector={self.article_body}")
         if self.head_img_div:
             imgs += self.extract_head_img(html, self.head_img_div, self.head_img_select)
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
