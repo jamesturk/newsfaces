@@ -36,7 +36,6 @@ class Extractor(object):
         imgs = []
 
         for selector in self.article_body:
-            print(selector)
             if len(html.cssselect(selector)[0]) > 0:
                 article_body = html.cssselect(selector)[0]
                 break
@@ -157,7 +156,7 @@ class Extractor(object):
         output: figure caption text
 
         """
-        figcaption = img.xpath("ancestor::figure/figcaption")
+        figcaption = img.xpath("ancestor::figure/figcaption | //figcaption")
         if figcaption:
             caption_text = figcaption[0].text_content().strip()
         else:
