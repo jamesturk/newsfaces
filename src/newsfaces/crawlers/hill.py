@@ -9,6 +9,7 @@ class TheHillArchive(WaybackCrawler):
         self.start_url = "https://thehill.com/policy/"
         self.selector = ["div.archive__item__content", "h2.node__title.node-title"]
 
+
 class Hill_Extractor(Extractor):
     def __init__(self):
         super().__init__()
