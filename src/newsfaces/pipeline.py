@@ -59,7 +59,7 @@ WAYBACK_SOURCE_MAPPING = {
     "breitbart": (BreitbartArchive(), None),
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), Fox_Extractor()),
-    "hill": (TheHillArchive(), Hill_Extractor),
+    "hill": (TheHillArchive(), Hill_Extractor()),
     "nbc": (NBCArchive(), None),
     "wapo": (WashingtonPostArchive(), None),
     "washtimes": (WashingtonTimesArchive(), None),
@@ -72,7 +72,7 @@ SOURCE_MAPPING = {
     "newsmax": (NewsmaxCrawler(), None),
     "npr": (NprCrawler(), None),
     "nyt": (NYTCrawler(), None),
-    "politico": (Politico(), Politico_Extractor),
+    "politico": (Politico(), Politico_Extractor()),
     "wapo_api": (WashingtonPost_API(), None),
 }
 
