@@ -25,6 +25,10 @@ from .crawlers import (
     WashingtonPostArchive,
     WashingtonPost_API,
     WashingtonTimesArchive,
+    # Extractors
+    Politico_Extractor,
+    Hill_Extractor,
+    Fox_Extractor,
 )
 
 """
@@ -54,8 +58,8 @@ WAYBACK_SOURCE_MAPPING = {
     "bbc": (BBCArchive(), None),
     "breitbart": (BreitbartArchive(), None),
     "cnn": (CnnArchive(), None),
-    "fox": (FoxArchive(), None),
-    "hill": (TheHillArchive(), None),
+    "fox": (FoxArchive(), Fox_Extractor()),
+    "hill": (TheHillArchive(), Hill_Extractor()),
     "nbc": (NBCArchive(), None),
     "wapo": (WashingtonPostArchive(), None),
     "washtimes": (WashingtonTimesArchive(), None),
@@ -64,11 +68,11 @@ WAYBACK_SOURCE_MAPPING = {
 SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
     "daily": (DailyCrawler(), None),
-    "fox_api": (Fox_API(), None),
+    "fox_api": (Fox_API(), Fox_Extractor()),
     "newsmax": (NewsmaxCrawler(), None),
     "npr": (NprCrawler(), None),
     "nyt": (NYTCrawler(), None),
-    "politico": (Politico(), None),
+    "politico": (Politico(), Politico_Extractor()),
     "wapo_api": (WashingtonPost_API(), None),
 }
 
