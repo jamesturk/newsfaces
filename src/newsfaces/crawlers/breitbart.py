@@ -33,7 +33,7 @@ class BreitbartExtractor(Extractor):
         self.p_selector = ["p"]
         self.t_selector = ["h1"]
         self.head_img_select = ["img"]
-        self.head_img_div = ["figure"]
+        self.head_img_div = ["//figure[(ancestor::header)]"]
 
     def extract_head_img(self, html, img_p_selector, img_selector):
         """
@@ -47,19 +47,23 @@ class BreitbartExtractor(Extractor):
             dictionary
             with src, alt, title, and caption as fields
         """
-        body = html.cssselect("header")[0]
-        img_container = body.cssselect(img_p_selector[0])
+        img_container = html.xpath(img_p_selector[0])
 
         # Check if there exists an img_container for head image
         if img_container:
             # Both the caption and head image live inside the same parent element
             head_img = img_container[0].cssselect(img_selector[0])[0]
-            caption_el = img_container[0].cssselect("cite")[0]
+            caption_el = img_container[0].cssselect("cite")
+
+            if caption_el:
+                caption_t = caption_el[0].text_content()
+            else:
+                caption_t = ""
 
             img_item = Image(
                 url=head_img.get("src") or "",
                 image_type=ImageType("main"),
-                caption=caption_el.text_content() or "",
+                caption=caption_t,
                 alt_text=head_img.get("alt") or "",
             )
             return [img_item]
