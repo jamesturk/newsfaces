@@ -508,29 +508,27 @@ files = [
 
 [[package]]
 name = "databeakers"
-version = "0.3.5"
+version = "0.3.6"
 description = ""
 optional = false
-python-versions = "^3.10"
-files = []
-develop = true
+python-versions = ">=3.10,<4.0"
+files = [
+    {file = "databeakers-0.3.6-py3-none-any.whl", hash = "sha256:e0852c1d96d56492c698c641bbe52dd4d8fbb11ce9452c4e54815831265d5670"},
+    {file = "databeakers-0.3.6.tar.gz", hash = "sha256:5769bebd757c84b2805c12017b0567cf3464c5f3b845a2620acf98f1fe238837"},
+]
 
 [package.dependencies]
-httpx = "^0.24.0"
-networkx = "^3.1"
-pydantic = "^2.0.2"
-pydantic-settings = "^2.0.2"
-pydot = "^1.4.2"
-rich = "^13.4.2"
-scrapelib = "^2.1.0"
-sqlite-utils = "^3.34"
-structlog = "^23.1.0"
-toml = "^0.10.2"
-typer = "^0.9.0"
-
-[package.source]
-type = "directory"
-url = "../databeakers"
+httpx = ">=0.24.0,<0.25.0"
+networkx = ">=3.1,<4.0"
+pydantic = ">=2.0.2,<3.0.0"
+pydantic-settings = ">=2.0.2,<3.0.0"
+pydot = ">=1.4.2,<2.0.0"
+rich = ">=13.4.2,<14.0.0"
+scrapelib = ">=2.1.0,<3.0.0"
+sqlite-utils = ">=3.34,<4.0"
+structlog = ">=23.1.0,<24.0.0"
+toml = ">=0.10.2,<0.11.0"
+typer = ">=0.9.0,<0.10.0"
 
 [[package]]
 name = "debugpy"
@@ -2851,4 +2849,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "387d08b81a9bdfd1476a5a51e99a5e847535dd19aef0b92a149d9bfa36375dcb"
+content-hash = "9859d781fc94656b21aed9cd300da160c1746a1b9c90b19a89dcd1ccf27a54a0"
