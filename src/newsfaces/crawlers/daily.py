@@ -128,6 +128,6 @@ class DailyExtractor(Extractor):
                         caption=caption or "",
                         alt_text=i.get("alt") or "",
                     )
-                imgs.append(img_item)
+                    imgs.append(img_item)
 
         return imgs
