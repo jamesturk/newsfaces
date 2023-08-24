@@ -115,7 +115,10 @@ class DailyExtractor(Extractor):
         # Obtain img info and captions which in the Daily both live inside the
         # same parent element (img_container)
         for container in img_container:
-            caption = container.cssselect("p.wp-caption-text")[0].text
+            try:
+                caption = container.cssselect("p.wp-caption-text")[0].text
+            except IndexError:
+                caption = ""
             for j in img_selector:
                 photos = container.cssselect(j)
                 for i in photos:
