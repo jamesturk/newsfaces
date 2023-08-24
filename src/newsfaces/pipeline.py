@@ -170,11 +170,11 @@ errors/timeouts into the same beakers.
 
 {source_response} then needs to become {article}, which is done by the extractor.
 """
+pipeline.add_beaker("article", Article)
 for source, classes in itertools.chain(
     WAYBACK_SOURCE_MAPPING.items(), SOURCE_MAPPING.items()
 ):
     (crawler, extractor) = classes
-    pipeline.add_beaker("article", Article)
     transform = HttpRequest()
     if source == "newsmax":
         transform = RateLimit(transform, 0.01)
@@ -193,7 +193,7 @@ for source, classes in itertools.chain(
         transform,
         error_map={
             (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError, httpx.InvalidURL, ValueError): f"errors",
+            (httpx.RequestError, httpx.InvalidURL, ValueError): "errors",
             (httpx.HTTPStatusError,): f"{source}_bad_response",
         },
     )
