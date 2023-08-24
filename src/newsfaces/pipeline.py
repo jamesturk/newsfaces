@@ -32,6 +32,11 @@ from .crawlers import (
 )
 from .extract_html import MissingBodyError
 
+from .crawlers.npr import NPRExtractor
+from .crawlers.daily import DailyExtractor
+from .crawlers.breitbart import BreitbartExtractor
+from .crawlers.newsmax import NewsmaxExtractor
+
 """
 This file defines the pipeline for the newsfaces project.
 
@@ -57,7 +62,7 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
     "bbc": (BBCArchive(), None),
-    "breitbart": (BreitbartArchive(), None),
+    "breitbart": (BreitbartArchive(), BreitbartExtractor()),
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), Fox_Extractor()),
     "hill": (TheHillArchive(), Hill_Extractor()),
@@ -68,10 +73,10 @@ WAYBACK_SOURCE_MAPPING = {
 
 SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
-    "daily": (DailyCrawler(), None),
+    "daily": (DailyCrawler(), DailyExtractor()),
     "fox_api": (Fox_API(), Fox_Extractor()),
-    "newsmax": (NewsmaxCrawler(), None),
-    "npr": (NprCrawler(), None),
+    "newsmax": (NewsmaxCrawler(), NewsmaxExtractor()),
+    "npr": (NprCrawler(), NPRExtractor()),
     "nyt": (NYTCrawler(), None),
     "politico": (Politico(), Politico_Extractor()),
     "wapo_api": (WashingtonPost_API(), None),
