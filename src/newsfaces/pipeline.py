@@ -4,6 +4,7 @@ from databeakers.edges import FieldSplitter, Transform
 from databeakers.http import HttpResponse, HttpRequest
 from databeakers.wrappers import RateLimit
 import httpx
+from lxml.etree import ParserError
 from .models import URL, Article
 from .pipeline_helpers import (
     make_extractor,
@@ -203,6 +204,6 @@ for source, classes in itertools.chain(
             "article",
             extractor.scrape,
             error_map={
-                (MissingBodyError,): "selector_errors",
+                (MissingBodyError, ParserError): "selector_errors",
             },
         )
