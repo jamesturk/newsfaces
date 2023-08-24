@@ -6,9 +6,7 @@ from databeakers.wrappers import RateLimit
 import httpx
 from lxml.etree import ParserError
 from .models import URL, Article
-from .pipeline_helpers import (
-    make_extractor,
-)
+from .pipeline_helpers import make_extractor
 from .crawlers import (
     BBCArchive,
     BBC_Latest,

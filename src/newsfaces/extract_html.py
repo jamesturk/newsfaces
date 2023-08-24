@@ -1,3 +1,5 @@
+# TODO: add annotation to scrape() once RateLimit properly handles the wrapped annotation
+# from databeakers.http import HttpResponse
 from newsfaces.models import Article, Image, ImageType
 import lxml.html
 
@@ -175,7 +177,7 @@ class Extractor:
     def get_video_imgs(self):
         return []
 
-    def scrape(self, response):
+    def scrape(self, response) -> Article | None:
         """
         Return article object from html string request
         """
