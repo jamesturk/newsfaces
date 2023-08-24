@@ -30,6 +30,12 @@ from .crawlers import (
     Hill_Extractor,
     Fox_Extractor,
 )
+from .extract_html import MissingBodyError
+
+from .crawlers.npr import NPRExtractor
+from .crawlers.daily import DailyExtractor
+from .crawlers.breitbart import BreitbartExtractor
+from .crawlers.newsmax import NewsmaxExtractor
 
 """
 This file defines the pipeline for the newsfaces project.
@@ -56,7 +62,7 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
     "bbc": (BBCArchive(), None),
-    "breitbart": (BreitbartArchive(), None),
+    "breitbart": (BreitbartArchive(), BreitbartExtractor()),
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), Fox_Extractor()),
     "hill": (TheHillArchive(), Hill_Extractor()),
@@ -67,10 +73,10 @@ WAYBACK_SOURCE_MAPPING = {
 
 SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
-    "daily": (DailyCrawler(), None),
+    "daily": (DailyCrawler(), DailyExtractor()),
     "fox_api": (Fox_API(), Fox_Extractor()),
-    "newsmax": (NewsmaxCrawler(), None),
-    "npr": (NprCrawler(), None),
+    "newsmax": (NewsmaxCrawler(), NewsmaxExtractor()),
+    "npr": (NprCrawler(), NPRExtractor()),
     "nyt": (NYTCrawler(), None),
     "politico": (Politico(), Politico_Extractor()),
     "wapo_api": (WashingtonPost_API(), None),
@@ -172,14 +178,31 @@ for source, classes in itertools.chain(
     transform = HttpRequest()
     if source == "newsmax":
         transform = RateLimit(transform, 0.01)
+    elif source == "hill":
+        transform = HttpRequest(
+            headers={
+                "user-agent": (
+                    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/92.0.4515.107 Mobile Safari/537.36"
+                )
+            }
+        )
     pipeline.add_transform(
         f"{source}_url",
         f"{source}_response",
         transform,
         error_map={
             (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError, httpx.InvalidURL, ValueError): "errors",
+            (httpx.RequestError, httpx.InvalidURL, ValueError): f"errors",
+            (httpx.HTTPStatusError,): f"{source}_bad_response",
         },
     )
     if extractor:
-        pipeline.add_transform(f"{source}_response", "article", extractor.scrape)
+        pipeline.add_transform(
+            f"{source}_response",
+            "article",
+            extractor.scrape,
+            error_map={
+                (MissingBodyError,): "selector_errors",
+            },
+        )
