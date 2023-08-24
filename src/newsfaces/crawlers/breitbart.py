@@ -73,7 +73,7 @@ class BreitbartExtractor(Extractor):
         for item in img_container:
             try:
                 img = item.cssselect(img_selector[0])[0]
-            except KeyError:  # img doesn't exist
+            except IndexError:  # img doesn't exist
                 continue
             try:
                 caption = item.cssselect("p.wp-caption-text")[0].text_content()
