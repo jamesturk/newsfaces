@@ -40,30 +40,18 @@ class Politico(Crawler):
 class Politico_Extractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.article_body = ["div.story-text"]
+        self.article_body = ["div.story-text", "div.super-inner"]
         self.img_p_selector = [
             "section.media-item.media-item--story.media-item--story-lead"
         ]
         self.img_selector = ["img"]
-        self.head_img_div = [
-            "section.media-item.media-item--story.media-item--story-lead"
-        ]
+        self.head_img_div = []
         self.video = ["div.media-item__video"]
-        self.head_img_select = ["img"]
-        self.p_selector = ["p"]
+        self.head_img_select = []
+        self.p_selector = ["p.story-text__paragraph"]
         self.t_selector = ["h2.headline"]
 
-    def scrape(self, url):
-        """
-        Extract html and from
-        """
-        html = page_grab(url)
-        imgs, art_text, t_text = self.extract_html(html)
-        imgs += self.extract_video_imgs(html)
-        article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
-        return article
-
-    def extract_video_imgs(self, html):
+    def get_video_imgs(self, html):
         videos = []
         imgs = []
 
@@ -89,5 +77,5 @@ class Politico_Extractor(Extractor):
 
         return imgs
 
-    def extract_head_img(self, html, img_p_selector, img_selector):
-        return []
+
+
