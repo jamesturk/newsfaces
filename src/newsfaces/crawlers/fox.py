@@ -57,10 +57,18 @@ class Fox_API(Crawler):
 class Fox_Extractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.article_body = ["div.article-content-wrap.sticky-columns"]
-        self.img_p_selector = ["div.m"]
+        self.article_body = ["div.article-content-wrap.sticky-columns", "article"]
+        self.img_p_selector = ["div[class^=image]"]
         self.img_selector = ["img"]
         self.head_img_div = None
         self.head_img_select = None
         self.p_selector = ["p"]
-        self.t_selector = ["h1"]
+        self.t_selector = ["h1.headline", "h1"]
+
+    def get_img_caption(self, img):
+        caption_div = img.xpath(".//following::div[contains(@class, 'caption')][1]")
+        if caption_div:
+            caption_text = caption_div[0].text_content().strip()
+            return caption_text
+        else:
+            return ""
