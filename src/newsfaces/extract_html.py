@@ -175,7 +175,7 @@ class Extractor:
             caption_text = ""
         return caption_text
 
-    def get_video_imgs(self):
+    def get_video_imgs(self, html):
         return []
 
     def scrape(self, response) -> Article | None:

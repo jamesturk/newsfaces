@@ -5,7 +5,7 @@ from .cnn import CnnArchive
 from .daily import DailyCrawler
 from .fox import FoxArchive, Fox_API, Fox_Extractor
 from .hill import TheHillArchive, Hill_Extractor
-from .nbc import NBCArchive
+from .nbc import NBCArchive, NBC_Extractor
 from .newsmax import NewsmaxCrawler
 from .npr import NprCrawler
 from .nyt import NYTCrawler

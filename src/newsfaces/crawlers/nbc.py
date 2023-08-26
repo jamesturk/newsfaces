@@ -24,10 +24,10 @@ class NBCArchive(WaybackCrawler):
 class NBC_Extractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.article_body = ["div.article-body__content"]
+        self.article_body = ["div.article-body__content", "article"]
         self.img_p_selector = ["picture"]
         self.img_selector = ["img"]
         self.head_img_div = ['figure[class^="article-hero__main"]']
         self.head_img_select = ["img"]
         self.p_selector = ["p"]
-        self.t_selector = ["h1"]
+        self.t_selector = ["h1[class^=article-hero]"]
