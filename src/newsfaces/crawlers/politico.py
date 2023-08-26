@@ -1,7 +1,7 @@
 from newsfaces.extract_html import Extractor
-from newsfaces.utils import make_link_absolute, page_grab
+from newsfaces.utils import make_link_absolute
 from newsfaces.crawler import Crawler
-from newsfaces.models import Image, Article, ImageType, URL
+from newsfaces.models import Image, ImageType, URL
 
 
 class Politico(Crawler):
@@ -76,6 +76,3 @@ class Politico_Extractor(Extractor):
                 imgs.append(img_item)
 
         return imgs
-
-
-

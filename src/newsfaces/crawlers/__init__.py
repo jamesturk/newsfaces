@@ -26,6 +26,7 @@ __all__ = [
     "TheHillArchive",
     "Hill_Extractor",
     "NBCArchive",
+    "NBC_Extractor",
     "NewsmaxCrawler",
     "NprCrawler",
     "NYTCrawler",

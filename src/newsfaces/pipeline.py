@@ -28,7 +28,7 @@ from .crawlers import (
     Politico_Extractor,
     Hill_Extractor,
     Fox_Extractor,
-    NBC_Extractor
+    NBC_Extractor,
 )
 from .extract_html import MissingBodyError
 
