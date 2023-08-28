@@ -1,7 +1,7 @@
 from newsfaces.extract_html import Extractor
-from newsfaces.utils import make_link_absolute, page_grab
+from newsfaces.utils import make_link_absolute
 from newsfaces.crawler import Crawler
-from newsfaces.models import Image, Article, ImageType, URL
+from newsfaces.models import Image, ImageType, URL
 
 
 class Politico(Crawler):
@@ -40,30 +40,22 @@ class Politico(Crawler):
 class Politico_Extractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.article_body = ["div.story-text"]
+        self.article_body = ["div.story-text", "div.super-inner"]
         self.img_p_selector = [
-            "section.media-item.media-item--story.media-item--story-lead"
+            "figure.story-photo",
+            "figure.media-item.type-photo",
+            "figure.art ",
+            "figure.art",
         ]
         self.img_selector = ["img"]
-        self.head_img_div = [
-            "section.media-item.media-item--story.media-item--story-lead"
-        ]
+        self.head_img_div = ["img"]
         self.video = ["div.media-item__video"]
-        self.head_img_select = ["img"]
-        self.p_selector = ["p"]
-        self.t_selector = ["h2.headline"]
+        self.head_img_select = ["figure.art "]
+        self.p_selector = ["p.story-text__paragraph", "p"]
+        self.t_selector = ["h2.headline", "div.summary h1"]
+        self.carousel = "figure.gallery-frag"
 
-    def scrape(self, url):
-        """
-        Extract html and from
-        """
-        html = page_grab(url)
-        imgs, art_text, t_text = self.extract_html(html)
-        imgs += self.extract_video_imgs(html)
-        article = Article(title=t_text or "", article_text=art_text or "", images=imgs)
-        return article
-
-    def extract_video_imgs(self, html):
+    def get_video_imgs(self, html):
         videos = []
         imgs = []
 
@@ -90,4 +82,33 @@ class Politico_Extractor(Extractor):
         return imgs
 
     def extract_head_img(self, html, img_p_selector, img_selector):
-        return []
+        imgs = super().extract_head_img(html, img_p_selector, img_selector)
+        carousel = html.cssselect(self.carousel)
+        if carousel:
+            for photo in carousel:
+                i = photo.cssselect("img")
+                caption_text = self.get_img_caption(i[0])
+                print(caption_text)
+                img_item = Image(
+                    url=i[0].get("data-lazy-img") or "",
+                    image_type=ImageType("main"),
+                    caption=caption_text,
+                    alt_text=i[0].get("alt") or "",
+                )
+                imgs.append(img_item)
+        return imgs
+
+    def get_img_caption(self, img):
+        """
+        if img has a figure attribute, get the related figure caption
+        input: image-parsed html for inage tage
+        output: figure caption text
+
+        """
+        figcaption = img.xpath("ancestor::figure/figcaption")
+        figcaption += img.xpath("//figcaption")
+        if figcaption:
+            caption_text = figcaption[0].text_content().strip()
+        else:
+            caption_text = ""
+        return caption_text
