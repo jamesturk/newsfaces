@@ -11,6 +11,7 @@ from .pipeline_helpers import (
 from .crawlers import (
     BBCArchive,
     BBC_Latest,
+    BBC_Extractor,
     BreitbartArchive,
     CnnArchive,
     DailyCrawler,
@@ -55,7 +56,7 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
 """
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
-    "bbc": (BBCArchive(), None),
+    "bbc": (BBCArchive(), BBC_Extractor()),
     "breitbart": (BreitbartArchive(), None),
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), Fox_Extractor()),
