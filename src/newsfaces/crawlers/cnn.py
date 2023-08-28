@@ -51,7 +51,10 @@ class CnnArchive(WaybackCrawler):
         article_link
 
         for article in article_elements:
-            rel_link = article.cssselect("a")[0].get("href")
+            try:
+                rel_link = article.cssselect("a")[0].get("href")
+            except IndexError:
+                continue
             absolute_link = make_link_absolute(rel_link, "https://www.cnn.com")
 
             urls.append(URL(url=absolute_link, source=self.source_name))

@@ -4,10 +4,9 @@ from databeakers.edges import FieldSplitter, Transform
 from databeakers.http import HttpResponse, HttpRequest
 from databeakers.wrappers import RateLimit
 import httpx
+from lxml.etree import ParserError
 from .models import URL, Article
-from .pipeline_helpers import (
-    make_extractor,
-)
+from .pipeline_helpers import make_extractor
 from .crawlers import (
     BBCArchive,
     BBC_Latest,
@@ -31,6 +30,12 @@ from .crawlers import (
     Hill_Extractor,
     Fox_Extractor,
 )
+from .extract_html import MissingBodyError
+
+from .crawlers.npr import NPRExtractor
+from .crawlers.daily import DailyExtractor
+from .crawlers.breitbart import BreitbartExtractor
+from .crawlers.newsmax import NewsmaxExtractor
 
 """
 This file defines the pipeline for the newsfaces project.
@@ -57,7 +62,7 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
     "bbc": (BBCArchive(), BBC_Extractor()),
-    "breitbart": (BreitbartArchive(), None),
+    "breitbart": (BreitbartArchive(), BreitbartExtractor()),
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), Fox_Extractor()),
     "hill": (TheHillArchive(), Hill_Extractor()),
@@ -68,10 +73,10 @@ WAYBACK_SOURCE_MAPPING = {
 
 SOURCE_MAPPING = {
     "bbc_latest": (BBC_Latest(), None),
-    "daily": (DailyCrawler(), None),
+    "daily": (DailyCrawler(), DailyExtractor()),
     "fox_api": (Fox_API(), Fox_Extractor()),
-    "newsmax": (NewsmaxCrawler(), None),
-    "npr": (NprCrawler(), None),
+    "newsmax": (NewsmaxCrawler(), NewsmaxExtractor()),
+    "npr": (NprCrawler(), NPRExtractor()),
     "nyt": (NYTCrawler(), None),
     "politico": (Politico(), Politico_Extractor()),
     "wapo_api": (WashingtonPost_API(), None),
@@ -165,22 +170,39 @@ errors/timeouts into the same beakers.
 
 {source_response} then needs to become {article}, which is done by the extractor.
 """
+pipeline.add_beaker("article", Article)
 for source, classes in itertools.chain(
     WAYBACK_SOURCE_MAPPING.items(), SOURCE_MAPPING.items()
 ):
     (crawler, extractor) = classes
-    pipeline.add_beaker("article", Article)
     transform = HttpRequest()
     if source == "newsmax":
         transform = RateLimit(transform, 0.01)
+    elif source == "hill":
+        transform = HttpRequest(
+            headers={
+                "user-agent": (
+                    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/92.0.4515.107 Mobile Safari/537.36"
+                )
+            }
+        )
     pipeline.add_transform(
         f"{source}_url",
         f"{source}_response",
         transform,
         error_map={
             (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError, httpx.InvalidURL): "errors",
+            (httpx.RequestError, httpx.InvalidURL, ValueError): "errors",
+            (httpx.HTTPStatusError,): f"{source}_bad_response",
         },
     )
     if extractor:
-        pipeline.add_transform(f"{source}_response", "article", extractor.scrape)
+        pipeline.add_transform(
+            f"{source}_response",
+            "article",
+            extractor.scrape,
+            error_map={
+                (MissingBodyError, ParserError): "selector_errors",
+            },
+        )

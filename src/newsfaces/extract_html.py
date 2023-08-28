@@ -1,8 +1,14 @@
+# TODO: add annotation to scrape() once RateLimit properly handles the wrapped annotation
+# from databeakers.http import HttpResponse
 from newsfaces.models import Article, Image, ImageType
 import lxml.html
 
 
-class Extractor(object):
+class MissingBodyError(Exception):
+    pass
+
+
+class Extractor:
     def __init__(self):
         self.article_body = []
         self.img_p_selector = []
@@ -36,10 +42,14 @@ class Extractor(object):
         imgs = []
 
         for selector in self.article_body:
-            print(selector)
-            if len(html.cssselect(selector)[0]) > 0:
-                article_body = html.cssselect(selector)[0]
+            results = html.cssselect(selector)
+            if len(results):
+                article_body = results[0]
                 break
+        else:
+            raise MissingBodyError(
+                f"No article body found selector={self.article_body}"
+            )
         if self.head_img_div:
             imgs += self.extract_head_img(html, self.head_img_div, self.head_img_select)
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
@@ -160,7 +170,7 @@ class Extractor(object):
         output: figure caption text
 
         """
-        figcaption = img.xpath("ancestor::figure/figcaption")
+        figcaption = img.xpath("ancestor::figure/figcaption | //figcaption")
         if figcaption:
             caption_text = figcaption[0].text_content().strip()
         else:
@@ -170,7 +180,7 @@ class Extractor(object):
     def get_video_imgs(self):
         return []
 
-    def scrape(self, response):
+    def scrape(self, response) -> Article | None:
         """
         Return article object from html string request
         """
