@@ -12,8 +12,7 @@ class NBCArchive(WaybackCrawler):
 
     def get_article_urls(self, response):
         # Retrieve the raw HTML content
-        html = response.response_body
-        doc = lxml.html.fromstring(html)
+        doc = lxml.html.fromstring(response.text)
         for link in doc.xpath("//a/@href"):
             for link_pattern in self.link_patterns:
                 if link_pattern in link:

@@ -52,7 +52,10 @@ class CnnArchive(WaybackCrawler):
         article_link
 
         for article in article_elements:
-            rel_link = article.cssselect("a")[0].get("href")
+            try:
+                rel_link = article.cssselect("a")[0].get("href")
+            except IndexError:
+                continue
             absolute_link = make_link_absolute(rel_link, "https://www.cnn.com")
 
             urls.append(URL(url=absolute_link, source=self.source_name))
@@ -67,7 +70,7 @@ class CnnArchive(WaybackCrawler):
         if JS_START_DATE < time_stamp < JS_END_DATE:
             yield from self.get_archive_urls_js(time_str)
         else:
-            yield from super().get_archive_urls(response)
+            yield from super().get_article_urls(response)
 
 
 class CNNExtractor(Extractor):

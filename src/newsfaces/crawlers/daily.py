@@ -62,13 +62,13 @@ class DailyCrawler(Crawler):
 class DailyExtractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.article_body = ["div.article-content-wrap.sticky-columns"]
-        self.img_p_selector = ["div.m"]
+        self.article_body = ["div#ob-read-more-selector"]
+        self.img_p_selector = ["div.wp-caption"]
         self.img_selector = ["img"]
-        self.head_img_div = ["div.contain"]
-        self.head_img_select = ["img"]
         self.p_selector = ["p"]
         self.t_selector = ["h1"]
+        self.head_img_select = ["img"]
+        self.head_img_div = ["div.featured-image"]
 
     def extract_head_img(self, html, img_p_selector, img_selector):
         """
@@ -115,7 +115,10 @@ class DailyExtractor(Extractor):
         # Obtain img info and captions which in the Daily both live inside the
         # same parent element (img_container)
         for container in img_container:
-            caption = container.cssselect("p.wp-caption-text")[0].text
+            try:
+                caption = container.cssselect("p.wp-caption-text")[0].text
+            except IndexError:
+                caption = ""
             for j in img_selector:
                 photos = container.cssselect(j)
                 for i in photos:
@@ -125,6 +128,6 @@ class DailyExtractor(Extractor):
                         caption=caption or "",
                         alt_text=i.get("alt") or "",
                     )
-                imgs.append(img_item)
+                    imgs.append(img_item)
 
         return imgs
