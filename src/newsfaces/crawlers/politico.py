@@ -53,7 +53,7 @@ class Politico_Extractor(Extractor):
         self.head_img_select = ["figure.art "]
         self.p_selector = ["p.story-text__paragraph", "p"]
         self.t_selector = ["h2.headline", "div.summary h1"]
-        self.carousel = "figure.gallery-frag"
+        self.carousel = "figure.gallery-frag img"
 
     def get_video_imgs(self, html):
         videos = []
@@ -84,18 +84,15 @@ class Politico_Extractor(Extractor):
     def extract_head_img(self, html, img_p_selector, img_selector):
         imgs = super().extract_head_img(html, img_p_selector, img_selector)
         carousel = html.cssselect(self.carousel)
-        if carousel:
-            for photo in carousel:
-                i = photo.cssselect("img")
-                caption_text = self.get_img_caption(i[0])
-                print(caption_text)
-                img_item = Image(
-                    url=i[0].get("data-lazy-img") or "",
-                    image_type=ImageType("main"),
-                    caption=caption_text,
-                    alt_text=i[0].get("alt") or "",
-                )
-                imgs.append(img_item)
+        for i in carousel:
+            caption_text = self.get_img_caption(i)
+            img_item = Image(
+                url=i.get("data-lazy-img") or "",
+                image_type=ImageType("main"),
+                caption=caption_text,
+                alt_text=i.get("alt") or "",
+            )
+            imgs.append(img_item)
         return imgs
 
     def get_img_caption(self, img):
