@@ -1,9 +1,8 @@
 import itertools
 from databeakers.pipeline import Pipeline
 from databeakers.edges import FieldSplitter, Transform
-from databeakers.http import HttpResponse, HttpRequest
+from databeakers.http import HttpEdge
 from databeakers.decorators import rate_limit
-import httpx
 from lxml.etree import ParserError
 from .models import URL, Article
 from .pipeline_helpers import make_extractor
@@ -97,16 +96,15 @@ We run this code in a loop since each source has the same basic structure.
 First we add the archive_url -> response transformation.
 """
 pipeline.add_beaker("archive_url", URL)
-pipeline.add_beaker("archive_response", HttpResponse)
-pipeline.add_transform(
+pipeline.add_out_transform(
     "archive_url",
-    "archive_response",
-    rate_limit(HttpRequest(), 1),
-    error_map={
-        (httpx.ReadTimeout,): "archive_timeouts",
-        (httpx.RequestError, httpx.InvalidURL): "archive_errors",
-    },
-)
+    HttpEdge(
+        "archive_response",
+        timeout_beaker="archive_timeouts",
+        error_beaker="archive_errors",
+        bad_response_beaker="archive_bad_response",
+    ),
+).decorate(rate_limit, 1)
 
 splitter_map = {}
 for source, classes in WAYBACK_SOURCE_MAPPING.items():
@@ -174,28 +172,28 @@ for source, classes in itertools.chain(
     WAYBACK_SOURCE_MAPPING.items(), SOURCE_MAPPING.items()
 ):
     (crawler, extractor) = classes
-    transform = HttpRequest()
-    if source == "newsmax":
-        transform = rate_limit(transform, 0.01)
-    elif source == "hill":
-        transform = HttpRequest(
-            headers={
-                "user-agent": (
-                    "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 "
-                    "(KHTML, like Gecko) Chrome/92.0.4515.107 Mobile Safari/537.36"
-                )
-            }
-        )
-    pipeline.add_transform(
+    if source == "hill":
+        headers = {
+            "user-agent": (
+                "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/92.0.4515.107 Mobile Safari/537.36"
+            )
+        }
+    else:
+        headers = None
+    edge = pipeline.add_out_transform(
         f"{source}_url",
-        f"{source}_response",
-        transform,
-        error_map={
-            (httpx.ReadTimeout,): "timeouts",
-            (httpx.RequestError, httpx.InvalidURL, ValueError): "errors",
-            (httpx.HTTPStatusError,): f"{source}_bad_response",
-        },
+        HttpEdge(
+            f"{source}_response",
+            timeout_beaker="timeouts",
+            error_beaker="errors",
+            bad_response_beaker=f"{source}_bad_response",
+            headers=headers,
+        ),
     )
+    if source == "newsmax":
+        edge.decorate(rate_limit, 0.01)
+
     if extractor:
         pipeline.add_transform(
             f"{source}_response",
