@@ -10,7 +10,7 @@ from .newsmax import NewsmaxCrawler
 from .npr import NprCrawler
 from .nyt import NYTCrawler
 from .politico import Politico, Politico_Extractor
-from .wapo import WashingtonPostArchive, WashingtonPost_API
+from .wapo import WashingtonPostArchive, WashingtonPost_API, WashingtonPost_Extractor
 from .washington_times import WashingtonTimesArchive
 
 __all__ = [
@@ -33,5 +33,6 @@ __all__ = [
     "Politico_Extractor",
     "WashingtonPostArchive",
     "WashingtonPost_API",
+    "WashingtonPost_Extractor",
     "WashingtonTimesArchive",
 ]

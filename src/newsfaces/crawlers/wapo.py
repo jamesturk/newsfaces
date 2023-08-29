@@ -2,6 +2,8 @@ import json
 from ..crawler import Crawler, WaybackCrawler
 from newsfaces.utils import make_link_absolute
 from newsfaces.models import URL
+from newsfaces.extract_html import Extractor
+
 
 
 class WashingtonPost_API(Crawler):
@@ -64,3 +66,18 @@ class WashingtonPostArchive(WaybackCrawler):
         for url in super().get_article_urls(response):
             if "https://www.washingtonpost.com/politics/2" in url.url:
                 yield url
+
+class WashingtonPost_Extractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["article"]
+        self.img_p_selector = ['div[data-qa="article-image"]']
+        self.img_selector = ["img"]
+        self.head_img_div = ['div[data-qa="lede-art"]']
+        self.head_img_select = ["img"]
+        self.p_selector = ["p"]
+        self.t_selector = ["h1"]
+
+
+
+
