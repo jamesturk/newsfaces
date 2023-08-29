@@ -48,9 +48,9 @@ class Politico_Extractor(Extractor):
             "figure.art",
         ]
         self.img_selector = ["img"]
-        self.head_img_div = ["img"]
+        self.head_img_div = ["figure.art "]
         self.video = ["div.media-item__video"]
-        self.head_img_select = ["figure.art "]
+        self.head_img_select = ["img"]
         self.p_selector = ["p.story-text__paragraph", "p"]
         self.t_selector = ["h2.headline", "div.summary h1"]
         self.carousel = "figure.gallery-frag img"
