@@ -161,7 +161,7 @@ class Extractor:
             )
             return [img_item]
         else:
-            []
+            return []
 
     def get_img_caption(self, img):
         """
