@@ -34,7 +34,7 @@ class Politico(Crawler):
                 yield URL(
                     url=make_link_absolute(href, "https://www.politico.com"),
                     source=self.source,
-                )
+      https://github.com/jamesturk/newsfaces/pull/97/conflict?name=src%252Fnewsfaces%252Fcrawlers%252Fpolitico.py&ancestor_oid=9a59f300acb2a47e5f18d653e8e087d75543d58f&base_oid=4c28d6e0cd7e6e25b1520f2964c33bb4e3c63fda&head_oid=e3459fa2282a68ad9d58ac19b7de5ab4b4de9ea6          )
 
 
 class Politico_Extractor(Extractor):
@@ -42,14 +42,18 @@ class Politico_Extractor(Extractor):
         super().__init__()
         self.article_body = ["div.story-text", "div.super-inner"]
         self.img_p_selector = [
-            "section.media-item.media-item--story.media-item--story-lead"
+            "figure.story-photo",
+            "figure.media-item.type-photo",
+            "figure.art ",
+            "figure.art",
         ]
         self.img_selector = ["img"]
-        self.head_img_div = []
+        self.head_img_div = ["figure.art "]
         self.video = ["div.media-item__video"]
-        self.head_img_select = []
-        self.p_selector = ["p.story-text__paragraph"]
-        self.t_selector = ["h2.headline"]
+        self.head_img_select = ["img"]
+        self.p_selector = ["p.story-text__paragraph", "p"]
+        self.t_selector = ["h2.headline", "div.summary h1"]
+        self.carousel = "figure.gallery-frag img"
 
     def get_video_imgs(self, html):
         videos = []
@@ -76,3 +80,32 @@ class Politico_Extractor(Extractor):
                 imgs.append(img_item)
 
         return imgs
+
+    def extract_head_img(self, html, img_p_selector, img_selector):
+        imgs = super().extract_head_img(html, img_p_selector, img_selector)
+        carousel = html.cssselect(self.carousel)
+        for i in carousel:
+            caption_text = self.get_img_caption(i)
+            img_item = Image(
+                url=i.get("data-lazy-img") or "",
+                image_type=ImageType("main"),
+                caption=caption_text,
+                alt_text=i.get("alt") or "",
+            )
+            imgs.append(img_item)
+        return imgs
+
+    def get_img_caption(self, img):
+        """
+        if img has a figure attribute, get the related figure caption
+        input: image-parsed html for inage tage
+        output: figure caption text
+
+        """
+        figcaption = img.xpath("ancestor::figure/figcaption")
+        figcaption += img.xpath("//figcaption")
+        if figcaption:
+            caption_text = figcaption[0].text_content().strip()
+        else:
+            caption_text = ""
+        return caption_text

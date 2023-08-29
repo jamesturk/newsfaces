@@ -64,6 +64,7 @@ class Fox_Extractor(Extractor):
         self.head_img_select = None
         self.p_selector = ["p"]
         self.t_selector = ["h1.headline", "h1"]
+
     def get_img_caption(self, img):
         caption_div = img.xpath(".//following::div[contains(@class, 'caption')][1]")
         if caption_div:
