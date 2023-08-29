@@ -54,7 +54,7 @@ class Extractor:
             imgs += self.extract_head_img(html, self.head_img_div, self.head_img_select)
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
         imgs += self.extract_social_media_image(html)
-        imgs += self.get_video_imgs()
+        imgs += self.get_video_imgs(html)
         art_text = self.extract_text(article_body, self.p_selector)
 
         for t in self.t_selector:
