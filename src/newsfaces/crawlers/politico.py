@@ -34,7 +34,7 @@ class Politico(Crawler):
                 yield URL(
                     url=make_link_absolute(href, "https://www.politico.com"),
                     source=self.source,
-                )
+      https://github.com/jamesturk/newsfaces/pull/97/conflict?name=src%252Fnewsfaces%252Fcrawlers%252Fpolitico.py&ancestor_oid=9a59f300acb2a47e5f18d653e8e087d75543d58f&base_oid=4c28d6e0cd7e6e25b1520f2964c33bb4e3c63fda&head_oid=e3459fa2282a68ad9d58ac19b7de5ab4b4de9ea6          )
 
 
 class Politico_Extractor(Extractor):
