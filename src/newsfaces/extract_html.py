@@ -153,13 +153,16 @@ class Extractor:
         returns: image object
         """
         container = html.cssselect('meta[property="og:image"]')
-        img_item = Image(
-            url=container[0].get("content"),
-            image_type=ImageType("social"),
-            caption="",
-            alt_text="",
-        )
-        return [img_item]
+        if container:
+            img_item = Image(
+                url=container[0].get("content"),
+                image_type=ImageType("social"),
+                caption="",
+                alt_text="",
+            )
+            return [img_item]
+        else:
+            return []
 
     def get_img_caption(self, img):
         """
