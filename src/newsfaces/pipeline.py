@@ -2,7 +2,7 @@ import itertools
 from databeakers.pipeline import Pipeline
 from databeakers.edges import FieldSplitter, Transform
 from databeakers.http import HttpResponse, HttpRequest
-from databeakers.wrappers import RateLimit
+from databeakers.decorators import rate_limit
 import httpx
 from lxml.etree import ParserError
 from .models import URL, Article
@@ -29,6 +29,8 @@ from .crawlers import (
     Politico_Extractor,
     Hill_Extractor,
     Fox_Extractor,
+    NBC_Extractor,
+    WashingtonTimes_Extractor,
 )
 from .extract_html import MissingBodyError
 
@@ -66,9 +68,9 @@ WAYBACK_SOURCE_MAPPING = {
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), Fox_Extractor()),
     "hill": (TheHillArchive(), Hill_Extractor()),
-    "nbc": (NBCArchive(), None),
+    "nbc": (NBCArchive(), NBC_Extractor()),
     "wapo": (WashingtonPostArchive(), None),
-    "washtimes": (WashingtonTimesArchive(), None),
+    "washtimes": (WashingtonTimesArchive(), WashingtonTimes_Extractor()),
 }
 
 SOURCE_MAPPING = {
@@ -102,7 +104,7 @@ pipeline.add_beaker("archive_response", HttpResponse)
 pipeline.add_transform(
     "archive_url",
     "archive_response",
-    RateLimit(HttpRequest(), 1),
+    rate_limit(HttpRequest(), 1),
     error_map={
         (httpx.ReadTimeout,): "archive_timeouts",
         (httpx.RequestError, httpx.InvalidURL): "archive_errors",
@@ -177,7 +179,7 @@ for source, classes in itertools.chain(
     (crawler, extractor) = classes
     transform = HttpRequest()
     if source == "newsmax":
-        transform = RateLimit(transform, 0.01)
+        transform = rate_limit(transform, 0.01)
     elif source == "hill":
         transform = HttpRequest(
             headers={

@@ -5,13 +5,13 @@ from .cnn import CnnArchive
 from .daily import DailyCrawler
 from .fox import FoxArchive, Fox_API, Fox_Extractor
 from .hill import TheHillArchive, Hill_Extractor
-from .nbc import NBCArchive
+from .nbc import NBCArchive, NBC_Extractor
 from .newsmax import NewsmaxCrawler
 from .npr import NprCrawler
 from .nyt import NYTCrawler
 from .politico import Politico, Politico_Extractor
 from .wapo import WashingtonPostArchive, WashingtonPost_API
-from .washington_times import WashingtonTimesArchive
+from .washington_times import WashingtonTimesArchive, WashingtonTimes_Extractor
 
 __all__ = [
     "APArchive",
@@ -27,6 +27,7 @@ __all__ = [
     "TheHillArchive",
     "Hill_Extractor",
     "NBCArchive",
+    "NBC_Extractor",
     "NewsmaxCrawler",
     "NprCrawler",
     "NYTCrawler",
@@ -34,5 +35,6 @@ __all__ = [
     "Politico_Extractor",
     "WashingtonPostArchive",
     "WashingtonPost_API",
+    "WashingtonTimes_Extractor",
     "WashingtonTimesArchive",
 ]
