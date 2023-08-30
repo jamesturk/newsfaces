@@ -28,6 +28,7 @@ from .crawlers import (
     Politico_Extractor,
     Hill_Extractor,
     Fox_Extractor,
+    WashingtonTimes_Extractor,
 )
 from .extract_html import MissingBodyError
 
@@ -67,7 +68,7 @@ WAYBACK_SOURCE_MAPPING = {
     "hill": (TheHillArchive(), Hill_Extractor()),
     "nbc": (NBCArchive(), None),
     "wapo": (WashingtonPostArchive(), None),
-    "washtimes": (WashingtonTimesArchive(), None),
+    "washtimes": (WashingtonTimesArchive(), WashingtonTimes_Extractor()),
 }
 
 SOURCE_MAPPING = {
