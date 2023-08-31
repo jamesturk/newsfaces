@@ -17,7 +17,7 @@ __all__ = [
     "APArchive",
     "BBCArchive",
     "BBC_Latest",
-    "BBC_Extractor"
+    "BBC_Extractor",
     "BreitbartArchive",
     "CnnArchive",
     "DailyCrawler",
