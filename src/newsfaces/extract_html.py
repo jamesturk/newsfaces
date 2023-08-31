@@ -54,12 +54,13 @@ class Extractor:
             imgs += self.extract_head_img(html, self.head_img_div, self.head_img_select)
         imgs += self.extract_imgs(article_body, self.img_p_selector, self.img_selector)
         imgs += self.extract_social_media_image(html)
-        imgs += self.get_video_imgs()
+        imgs += self.get_video_imgs(html)
         art_text = self.extract_text(article_body, self.p_selector)
 
         for t in self.t_selector:
-            if html.cssselect(t)[0].text is not None:
-                t_text = html.cssselect(t)[0].text
+            results = html.cssselect(t)
+            if len(results):
+                t_text = results[0].text
                 break
         return imgs, art_text, t_text
 
@@ -152,13 +153,16 @@ class Extractor:
         returns: image object
         """
         container = html.cssselect('meta[property="og:image"]')
-        img_item = Image(
-            url=container[0].get("content"),
-            image_type=ImageType("social"),
-            caption="",
-            alt_text="",
-        )
-        return [img_item]
+        if container:
+            img_item = Image(
+                url=container[0].get("content"),
+                image_type=ImageType("social"),
+                caption="",
+                alt_text="",
+            )
+            return [img_item]
+        else:
+            return []
 
     def get_img_caption(self, img):
         """
@@ -174,7 +178,7 @@ class Extractor:
             caption_text = ""
         return caption_text
 
-    def get_video_imgs(self):
+    def get_video_imgs(self, html):
         return []
 
     def scrape(self, response: HttpResponse) -> Article | None:

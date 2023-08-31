@@ -9,6 +9,7 @@ from .pipeline_helpers import make_extractor
 from .crawlers import (
     BBCArchive,
     BBC_Latest,
+    BBC_Extractor,
     BreitbartArchive,
     CnnArchive,
     DailyCrawler,
@@ -27,6 +28,8 @@ from .crawlers import (
     Politico_Extractor,
     Hill_Extractor,
     Fox_Extractor,
+    NBC_Extractor,
+    WashingtonTimes_Extractor,
 )
 from .extract_html import MissingBodyError
 
@@ -59,14 +62,14 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
 """
 WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
-    "bbc": (BBCArchive(), None),
+    "bbc": (BBCArchive(), BBC_Extractor()),
     "breitbart": (BreitbartArchive(), BreitbartExtractor()),
     "cnn": (CnnArchive(), None),
     "fox": (FoxArchive(), Fox_Extractor()),
     "hill": (TheHillArchive(), Hill_Extractor()),
-    "nbc": (NBCArchive(), None),
+    "nbc": (NBCArchive(), NBC_Extractor()),
     "wapo": (WashingtonPostArchive(), None),
-    "washtimes": (WashingtonTimesArchive(), None),
+    "washtimes": (WashingtonTimesArchive(), WashingtonTimes_Extractor()),
 }
 
 SOURCE_MAPPING = {
