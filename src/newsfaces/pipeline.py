@@ -37,6 +37,7 @@ from .crawlers.npr import NPRExtractor
 from .crawlers.daily import DailyExtractor
 from .crawlers.breitbart import BreitbartExtractor
 from .crawlers.newsmax import NewsmaxExtractor
+from .crawlers.cnn import CNNExtractor
 
 """
 This file defines the pipeline for the newsfaces project.
@@ -64,7 +65,7 @@ WAYBACK_SOURCE_MAPPING = {
     # "ap": (AP(), None),
     "bbc": (BBCArchive(), BBC_Extractor()),
     "breitbart": (BreitbartArchive(), BreitbartExtractor()),
-    "cnn": (CnnArchive(), None),
+    "cnn": (CnnArchive(), CNNExtractor()),
     "fox": (FoxArchive(), Fox_Extractor()),
     "hill": (TheHillArchive(), Hill_Extractor()),
     "nbc": (NBCArchive(), NBC_Extractor()),
