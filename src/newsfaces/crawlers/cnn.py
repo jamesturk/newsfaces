@@ -6,7 +6,8 @@ import pytz
 from databeakers.http import HttpResponse
 from ..crawler import WaybackCrawler
 from ..utils import make_link_absolute
-from ..models import URL
+from ..models import URL, Image, ImageType
+from ..extract_html import Extractor
 from typing import Generator
 
 # The results for https://cnn.com/politics have different types of answers
@@ -70,3 +71,105 @@ class CnnArchive(WaybackCrawler):
             yield from self.get_archive_urls_js(time_str)
         else:
             yield from super().get_article_urls(response)
+
+
+class CNNExtractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["main.article__main"]
+        self.article_body = ["div.article__content-container"]
+        # self.img_p_selector = ["div.image__container"]
+        self.img_p_selector = [
+            """//div[@class="figure-container"]
+                               [not(ancestor::div[@class="related-content__image"])]"""
+        ]
+        self.img_selector = ["img"]
+        self.p_selector = ["p.paragraph"]
+        self.t_selector = ["h1.headline__text"]
+        self.head_img_select = ["img"]
+        self.head_img_div = ["picture.image__picture"]
+
+    def extract_head_img(self, html, img_p_selector, img_selector):
+        """
+        Extract the image content from an HTML:
+        Inputs:
+            - html(str): html to extract images from
+            - img_p_selector(list): css selector for the parent elements of images
+            - img_selector(list): list of css selector for the image elements
+            Return:
+            -imgs(lst): list where each element is an image represented as a
+            dictionary
+            with src, alt, title, and caption as fields
+        """
+        caption_selectors = ["div.video-resource__headline", "span.inline-placeholder"]
+        body = html.cssselect("div.image__lede")[0]
+        img_container = body.cssselect(img_p_selector[0])
+
+        # Check if there exists an img_container for head image
+        if img_container:
+            # Both the caption and head image live inside the same parent element
+            # a.Grab img:
+            head_img = img_container[0].cssselect(img_selector[0])[0]
+            # Grab caption:
+            # b.
+            for cap_s in caption_selectors:
+                cap_el = body.cssselect(cap_s)
+                if cap_el:
+                    caption_t = cap_el[0].text_content()
+                    break
+                else:
+                    caption_t = ""
+
+            img_item = Image(
+                url=head_img.get("src") or "",
+                image_type=ImageType("main"),
+                caption=caption_t,
+                alt_text=head_img.get("alt") or "",
+            )
+            return [img_item]
+        else:
+            return []
+
+    def extract_imgs(self, html, img_p_selector, img_selector):
+        imgs = []
+
+        caption_selector = "span.inline-placeholder"
+
+        # a.Save img items
+        #
+        # img_containers = html.cssselect(img_p_selector[0])
+        img_containers = html.xpath(img_p_selector[0])
+        img_elements = []
+        if img_containers:
+            for container in img_containers:
+                img_elements.append(container.cssselect(img_selector[0])[0])
+
+        # b.save captions
+        caption_el = html.cssselect(caption_selector)
+        captions = []
+        if caption_el:
+            for caption in caption_el:
+                caption_t = caption.text_content()
+                captions.append(caption_t)
+
+        # Only match captions if there are as many captions as img_elements
+        if len(img_elements) == len(captions):
+            for i in range(len(img_elements)):
+                img_item = Image(
+                    url=img_elements[i].get("src") or "",
+                    image_type=ImageType("main"),
+                    caption=captions[i] or "",
+                    alt_text=img_elements[i].get("alt") or "",
+                )
+                imgs.append(img_item)
+        else:
+            for i in img_elements:
+                img_item = Image(
+                    url=img_elements[i].get("src") or "",
+                    image_type=ImageType("main"),
+                    caption="",
+                    alt_text=img_elements[i].get("alt") or "",
+                )
+                imgs.append(img_item)
+
+        return imgs
