@@ -30,14 +30,18 @@ class APArchive(WaybackCrawler):
             "div.FourColumnContainer-column",
             "div.TwoColumnContainer7030",
             "div.PageList-items",
-            "div.storyContainer"
-
+            "div.storyContainer",
         ]
         for a in selectors:
             container = doc.cssselect(a)
             if len(container) > 0:
                 yield from self.parse_links(container)
-        xpath_sel = ["TwoColumnContainer", "CardHeadline","primaryContent", "article-layout"]
+        xpath_sel = [
+            "TwoColumnContainer",
+            "CardHeadline",
+            "primaryContent",
+            "article-layout",
+        ]
         # for items that have random characters continually added at the end so we do
         # non-exact matching
         for j in xpath_sel:
@@ -59,13 +63,18 @@ class APArchive(WaybackCrawler):
                         href = make_link_absolute(href, "https://web.archive.org")
                         clean_href = memento_url_data(href)[0]
                     yield URL(url=clean_href, source=self.source_name)
-    
+
     def get_wayback_urls(self, when: str):
-        urls= ["https://apnews.com/hub/politics", "https://apnews.com/politics",
-            "https://apnews.com/tag/apf-politics", "http://bigstory.ap.org/on-the-campaign-trail"]
+        urls = [
+            "https://apnews.com/hub/politics",
+            "https://apnews.com/politics",
+            "https://apnews.com/tag/apf-politics",
+            "http://bigstory.ap.org/on-the-campaign-trail",
+        ]
         for i in range(len(urls)):
             self.start_url = urls[i]
             yield from super().get_wayback_urls(when)
+
 
 class AP_Extractor(Extractor):
     def __init__(self):
@@ -109,5 +118,3 @@ class AP_Extractor(Extractor):
                     break
 
         return imgs
-    
-    

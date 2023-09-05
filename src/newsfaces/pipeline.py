@@ -64,7 +64,7 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
  extractor class.
 """
 WAYBACK_SOURCE_MAPPING = {
-     "ap": (APArchive(), AP_Extractor()),
+    "ap": (APArchive(), AP_Extractor()),
     "bbc": (BBCArchive(), BBC_Extractor()),
     "breitbart": (BreitbartArchive(), BreitbartExtractor()),
     "cnn": (CnnArchive(), CNNExtractor()),
