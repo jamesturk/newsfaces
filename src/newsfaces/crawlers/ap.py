@@ -89,13 +89,14 @@ class AP_Extractor(Extractor):
 
     def extract_head_img(self, html, img_p_selector, img_selector):
         """
-        Extract the image content from parsed HTML:
+        In this case, head img function deals with all carousels.
+        In contrast, extract_img function will get any article based images on page.
         Inputs:
             - html(str): Html from HTTP request
             - img_p_selector(list): css selector for the parent elements of images
             - img_selector(list): list of css selector for the image elements
             Return:
-            -imgs(lst): list where each element is an image represented as a dictionary
+            -imgs: list where each element is an image represented as a dictionary
             with src, alt, title, and caption as fields
         """
         imgs = []
