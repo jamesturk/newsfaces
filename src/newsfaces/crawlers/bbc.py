@@ -64,7 +64,7 @@ class BBCArchive(WaybackCrawler):
 class BBC_Extractor(Extractor):
     def __init__(self):
         super().__init__()
-        self.article_body = ["main"]
+        self.article_body = ["main", "article"]
         self.img_p_selector = ["figure", "div#mediaContainer"]
         self.img_selector = ["img"]
         self.head_img_div = []
