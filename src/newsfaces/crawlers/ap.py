@@ -1,6 +1,9 @@
-from newsfaces.utils import make_link_absolute
 from ..crawler import WaybackCrawler
+from newsfaces.extract_html import Extractor
+from newsfaces.utils import make_link_absolute
 import lxml.html
+from ..models import URL, Image, ImageType
+from wayback import memento_url_data
 
 
 class APArchive(WaybackCrawler):
@@ -27,17 +30,22 @@ class APArchive(WaybackCrawler):
             "div.FourColumnContainer-column",
             "div.TwoColumnContainer7030",
             "div.PageList-items",
-            "article",
+            "div.storyContainer",
         ]
         for a in selectors:
             container = doc.cssselect(a)
             if len(container) > 0:
                 yield from self.parse_links(container)
-        xpath_sel = ["TwoColumnContainer", "CardHeadline"]
+        xpath_sel = [
+            "TwoColumnContainer",
+            "CardHeadline",
+            "primaryContent",
+            "article-layout",
+        ]
         # for items that have random characters continually added at the end so we do
         # non-exact matching
         for j in xpath_sel:
-            container = response.xpath(f"//div[contains(@class, '{j}')]")
+            container = doc.xpath(f"//div[contains(@class, '{j}')]")
             if len(container) > 0:
                 yield from self.parse_links(container)
 
@@ -46,7 +54,6 @@ class APArchive(WaybackCrawler):
         Takes a list of container objects and returns the urls
         from within
         """
-        urls = []
         for j in container[0]:
             atr = j.cssselect("a")
             for a in atr:
@@ -54,12 +61,61 @@ class APArchive(WaybackCrawler):
                 if href is not None:
                     if href.startswith("/web/"):
                         href = make_link_absolute(href, "https://web.archive.org")
-                    urls.append(href)
-        return urls
+                        clean_href = memento_url_data(href)[0]
+                    yield URL(url=clean_href, source=self.source_name)
 
-    def get_wayback_urls(self):
-        self.start_url = "https://apnews.com/hub/politics"
-        yield from super().get_wayback_urls()
-        # change_date = datetime.datetime(2023, 6, 26, 0, 0, tzinfo=pytz.timezone("utc"))
-        # self.start_url = "https://apnews.com/politics"
-        # yield from super().get_wayback_urls()
+    def get_wayback_urls(self, when: str):
+        urls = [
+            "https://apnews.com/hub/politics",
+            "https://apnews.com/politics",
+            "https://apnews.com/tag/apf-politics",
+            "http://bigstory.ap.org/on-the-campaign-trail",
+        ]
+        for i in range(len(urls)):
+            self.start_url = urls[i]
+            yield from super().get_wayback_urls(when)
+
+
+class AP_Extractor(Extractor):
+    def __init__(self):
+        super().__init__()
+        self.article_body = ["main.Page-main"]
+        self.img_p_selector = ["figure.Figure"]
+        self.img_selector = ["img"]
+        self.head_img_div = ["div.CarouselSlide"]
+        self.head_img_select = ["img"]
+        self.p_selector = ["p"]
+        self.t_selector = ["h1.Page-headline"]
+
+    def extract_head_img(self, html, img_p_selector, img_selector):
+        """
+        In this case, head img function deals with all carousels.
+        In contrast, extract_img function will get any article based images on page.
+        Inputs:
+            - html(str): Html from HTTP request
+            - img_p_selector(list): css selector for the parent elements of images
+            - img_selector(list): list of css selector for the image elements
+            Return:
+            -imgs: list where each element is an image represented as a dictionary
+            with src, alt, title, and caption as fields
+        """
+        imgs = []
+        for selector in img_p_selector:
+            img_container = html.cssselect(selector)
+            if len(img_container) == 0:
+                continue
+            for container in img_container:
+                for j in img_selector:
+                    photos = container.cssselect(j)
+                    for i in photos:
+                        caption_text = self.get_img_caption(i)
+                        img_item = Image(
+                            url=i.get("data-flickity-lazyload") or "",
+                            image_type=ImageType("main"),
+                            caption=caption_text,
+                            alt_text=i.get("alt") or "",
+                        )
+                        imgs.append(img_item)
+                    break
+
+        return imgs

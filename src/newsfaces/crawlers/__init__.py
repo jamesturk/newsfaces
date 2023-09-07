@@ -1,4 +1,4 @@
-from .ap import APArchive
+from .ap import APArchive, AP_Extractor
 from .bbc import BBCArchive, BBC_Latest, BBC_Extractor
 from .breitbart import BreitbartArchive
 from .cnn import CnnArchive
@@ -15,6 +15,7 @@ from .washington_times import WashingtonTimesArchive, WashingtonTimes_Extractor
 
 __all__ = [
     "APArchive",
+    "AP_Extractor",
     "BBCArchive",
     "BBC_Latest",
     "BBC_Extractor",

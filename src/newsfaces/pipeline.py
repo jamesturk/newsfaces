@@ -7,6 +7,8 @@ from lxml.etree import ParserError
 from .models import URL, Article
 from .pipeline_helpers import make_extractor
 from .crawlers import (
+    APArchive,
+    AP_Extractor,
     BBCArchive,
     BBC_Latest,
     BBC_Extractor,
@@ -62,7 +64,7 @@ An alternative to this would be to have the classes be named very rigidly (e.g. 
  extractor class.
 """
 WAYBACK_SOURCE_MAPPING = {
-    # "ap": (AP(), None),
+    "ap": (APArchive(), AP_Extractor()),
     "bbc": (BBCArchive(), BBC_Extractor()),
     "breitbart": (BreitbartArchive(), BreitbartExtractor()),
     "cnn": (CnnArchive(), CNNExtractor()),
