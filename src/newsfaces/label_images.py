@@ -2,8 +2,14 @@ import re
 import pathlib
 import httpx
 from deepface import DeepFace
-from .models import LabeledImage, Image
+from .models import Image
 from .politicians import DONALD_TRUMP, JOE_BIDEN, HILLARY_CLINTON
+from pydantic import BaseModel
+
+
+class LabeledImage(BaseModel):
+    label: dict
+
 
 POLITICIANS = [DONALD_TRUMP, JOE_BIDEN, HILLARY_CLINTON]
 
