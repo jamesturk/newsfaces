@@ -1,6 +1,3 @@
-import re
-
-
 class Politician:
     def __init__(
         self, first_name, middle_name, last_name, nickname=None, image_path=None
