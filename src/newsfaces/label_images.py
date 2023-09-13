@@ -8,7 +8,7 @@ from .politicians import DONALD_TRUMP, JOE_BIDEN, HILLARY_CLINTON
 POLITICIANS = [DONALD_TRUMP, JOE_BIDEN, HILLARY_CLINTON]
 
 
-def label_images(id_, image):
+def label_image(id_, image):
     """
     Create LabeledImage object from an Image object
     Input:
@@ -17,10 +17,10 @@ def label_images(id_, image):
     LabeledImage object
     """
     # Check if image has a face in it and if not, skip labeling process
-    n_faces = n_faces_in_image(id_,image)
+    n_faces = n_faces_in_image(id_, image)
     image_label = {}
     if n_faces == 0:
-        image_label["no-face-recognized"]=None
+        image_label["no-face-recognized"] = None
         return LabeledImage(label=image_label)
     # Check if face in image matches the one of the politicians of interes
     else:
@@ -32,7 +32,7 @@ def label_images(id_, image):
             for politician in text_politicians:
                 verify = DeepFace.verify(
                     img1_path=politician.image,
-                    img2_path=str(get_image_path(id_,image)),
+                    img2_path=str(get_image_path(id_, image)),
                 )
                 if verify["verified"]:
                     label_score = 1 - verify["distance"]
@@ -42,7 +42,7 @@ def label_images(id_, image):
             for politician in POLITICIANS:
                 verify = DeepFace.verify(
                     img1_path=politician.image,
-                    img2_path=str(get_image_path(id_,image)),
+                    img2_path=str(get_image_path(id_, image)),
                 )
                 if verify["verified"]:
                     label_score = 1 - verify["distance"]
