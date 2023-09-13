@@ -107,5 +107,5 @@ def n_faces_in_image(id_, image):
     try:
         emb = DeepFace.represent(str(get_image_path(id_, image)))
         return len(emb)
-    except:
+    except ValueError:
         return 0
