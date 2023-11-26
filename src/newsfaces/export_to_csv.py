@@ -12,7 +12,7 @@ with open("images.csv", "w") as f:
     ]
     dw = csv.DictWriter(f, fields)
 
-    for row in pipeline._grab_rows(["article"], max_items=100000, offset=0):
+    for row in pipeline._grab_rows(["article"], max_items=999999999999, offset=0):
         for img in row["images"]:
             dw.writerow(
                 dict(

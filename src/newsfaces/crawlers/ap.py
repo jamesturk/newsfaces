@@ -69,7 +69,7 @@ class APArchive(WaybackCrawler):
             "https://apnews.com/hub/politics",
             "https://apnews.com/politics",
             "https://apnews.com/tag/apf-politics",
-            "http://bigstory.ap.org/on-the-campaign-trail",
+            #"http://bigstory.ap.org/on-the-campaign-trail",
         ]
         for i in range(len(urls)):
             self.start_url = urls[i]

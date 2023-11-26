@@ -198,7 +198,7 @@ for source, classes in itertools.chain(
         ),
     )
     if source == "newsmax":
-        edge.decorate(rate_limit, 0.01)
+        edge.decorate(rate_limit, 0.5)
 
     if extractor:
         pipeline.add_transform(
