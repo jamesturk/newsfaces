@@ -25,6 +25,7 @@ from .crawlers import (
     Politico,
     WashingtonPostArchive,
     WashingtonPost_API,
+    WashingtonPost_Extractor,
     WashingtonTimesArchive,
     # Extractors
     Politico_Extractor,
@@ -71,7 +72,7 @@ WAYBACK_SOURCE_MAPPING = {
     "fox": (FoxArchive(), Fox_Extractor()),
     "hill": (TheHillArchive(), Hill_Extractor()),
     "nbc": (NBCArchive(), NBC_Extractor()),
-    "wapo": (WashingtonPostArchive(), None),
+    "wapo": (WashingtonPostArchive(), WashingtonPost_Extractor()),
     "washtimes": (WashingtonTimesArchive(), WashingtonTimes_Extractor()),
 }
 
