@@ -1,36 +1,25 @@
-[tool.poetry]
+[project]
 name = "newsfaces"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Add your description here"
 readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cssselect>=1.3.0",
+    "databeakers>=0.3.9",
+    "httpx>=0.24.1",
+    "jupyter>=1.1.1",
+    "lxml>=5.4.0",
+    "pydantic>=2.11.5",
+    "pytz>=2025.2",
+    "structlog>=23.3.0",
+    "typer>=0.9.4",
+    "wayback>=0.4.5",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-structlog = "^23.1.0"
-httpx = "^0.24.1"
-lxml = "^4.9.2"
-cssselect = "^1.2.0"
-pydantic = "^2.0"
-typer = "^0.9.0"
-jupyter = "^1.0.0"
-wayback = "^0.4.2"
-pytz = "^2023.3"
-databeakers = "0.3.9"
-#databeakers = {path = "../beakers", develop = true}
-
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.0.280"
-black = "^23.7.0"
-
-[tool.ruff]
-line-length = 100
-
-[tool.mypy]
-exclude = "tests/*"
-
+[tool.uv.sources]
+databeakers = { path = "../databeakers", editable = true }
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
